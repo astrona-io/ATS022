@@ -1,0 +1,112 @@
+schema_version: 1
+kind: question_bank
+id: ats022-section-020
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: section
+  id: section-020
+  title: Configure volume types, access modes and reclaim policies
+placement:
+  position: after
+  reading: sections/section-020/module-01/course-04-summary.md
+questions:
+- id: ats022-section-020-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Compare ephemeral and persistent volume lifetimes.
+  source_readings:
+  - sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+  prompt: An application needs temporary files that survive a container restart within its current Pod.
+    Which choice fits?
+  options:
+  - id: a
+    text: A Service selector
+    explanation: Routing selection provides no file retention.
+  - id: b
+    text: An emptyDir volume
+    explanation: emptyDir normally remains during container restart but ends with the Pod's lifetime.
+  - id: c
+    text: The container's ordinary writable layer as a persistent storage guarantee
+    explanation: A writable layer should not be treated as Pod-independent durable storage.
+  correct_option: b
+  explanation: emptyDir normally remains during container restart but ends with the Pod's lifetime.
+- id: ats022-section-020-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Compare ephemeral and persistent volume lifetimes.
+  source_readings:
+  - sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+  prompt: A Pod using emptyDir is deleted and replaced. What should the application expect?
+  options:
+  - id: a
+    text: The replacement does not inherit that Pod's emptyDir data
+    explanation: The volume is scoped to the earlier Pod's lifetime.
+  - id: b
+    text: The same temporary directory is automatically restored from backup
+    explanation: emptyDir does not supply automatic backup or replacement restoration.
+  - id: c
+    text: The directory becomes a persistent claim
+    explanation: Pod replacement does not change the volume's declared kind.
+  correct_option: a
+  explanation: The volume is scoped to the earlier Pod's lifetime.
+- id: ats022-section-020-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain class selection and dynamic provisioning.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: A persistent claim remains Pending. Which information is most relevant?
+  options:
+  - id: a
+    text: The Ingress path type
+    explanation: External routing does not bind the claim.
+  - id: b
+    text: The application log format alone
+    explanation: The process may not be running while storage preparation is blocked.
+  - id: c
+    text: Claim requirements, class and provisioning or binding conditions
+    explanation: Storage availability depends on a suitable backing volume or provisioner and matching
+      requirements.
+  correct_option: c
+  explanation: Storage availability depends on a suitable backing volume or provisioner and matching requirements.
+- id: ats022-section-020-q04
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain application concurrency limits.
+  source_readings:
+  - sections/section-020/module-01/course-02-access-modes-and-data-presentation.md
+  prompt: Why is an access mode insufficient to guarantee safe concurrent application writes?
+  options:
+  - id: a
+    text: It creates a backup before each modification
+    explanation: Storage access modes do not provide that backup behavior.
+  - id: b
+    text: It describes supported storage use, not the application's coordination protocol
+    explanation: Application locking and data consistency remain separate requirements.
+  - id: c
+    text: It automatically serializes every process write
+    explanation: The access declaration is not a universal application transaction system.
+  correct_option: b
+  explanation: Application locking and data consistency remain separate requirements.
+- id: ats022-section-020-q05
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Predict reclaim and recovery consequences.
+  source_readings:
+  - sections/section-020/module-01/course-03-reclaim-policies-and-recovery.md
+  prompt: What must be reviewed before deleting a claim whose data matters?
+  options:
+  - id: a
+    text: The volume's reclaim policy and backend retention behavior
+    explanation: Deletion consequences depend on the storage lifecycle and policies in effect.
+  - id: b
+    text: Only whether the application Pod is Running
+    explanation: Process state does not determine backing data retention.
+  - id: c
+    text: Only the claim's display name
+    explanation: A name does not describe the volume deletion contract.
+  correct_option: a
+  explanation: Deletion consequences depend on the storage lifecycle and policies in effect.
