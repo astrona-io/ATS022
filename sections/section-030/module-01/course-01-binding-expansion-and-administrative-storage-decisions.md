@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Binding, Expansion And Administrative Storage Decisions
 
+A claim asks for a larger filesystem, but its provisioner does not support expansion. Editing requested capacity cannot create a missing backend capability. Storage administration starts with the contract that the provisioner and volume actually support.
+
+## Learning objectives
+
+- Explain PV and PVC scope and matching.
+- Distinguish static binding from dynamic allocation.
+- Diagnose provisioning, attachment and mount stages.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 A PersistentVolume, or PV, represents cluster-managed storage capacity under a declared contract. A PersistentVolumeClaim, or PVC, requests suitable storage for a workload. The administrator connects those requests to provisioners, backend capabilities and lifecycle policy while preserving the intended application data requirements.
 
 ## Match Static Capacity Or Request Dynamic Provisioning
@@ -38,6 +52,29 @@ A reclaim policy influences what happens after a volume is released from its cla
 Ownership, residual data and backend cleanup must be considered before reuse. A new claim should not inadvertently expose an earlier tenant's data. Protection mechanisms can delay deletion while resources remain in use, but finalizer presence is not proof of a complete backup or indefinite retention guarantee.
 
 For a failed storage operation, identify the stage: matching, provisioning, topology selection, attachment, mounting or expansion. Connect observations to the responsible controller or node agent. That layered explanation preserves important data requirements while selecting a correction appropriate to the actual failure.
+
+## Work through the decision
+
+Consider a bound claim that requests ten gibibytes and now needs twenty. The requested capacity, the volume's recorded capacity and the filesystem's usable capacity can change at different stages. The StorageClass must permit expansion, and the driver and backend must implement the requested operation.
+
+Binding also establishes ownership and location constraints. A similarly named volume does not override incompatible access or topology requirements. Before a change, identify the claim, its bound volume, its class and the consumer. Afterward, distinguish accepted intent from backend resize and filesystem completion. Recovery planning remains necessary because increasing capacity does not restore deleted data.
+
+```mermaid
+flowchart TB
+    N0["Claim change"]
+    N1["Class and driver capability"]
+    N2["Backend capacity change"]
+    N3["Filesystem completion"]
+    N4["Consumer verification"]
+    N0 --> N1
+    N1 --> N2
+    N2 --> N3
+    N3 --> N4
+```
+
+Storage changes need compatible capabilities and evidence at each transition, not merely an updated request field.
+
+Storage changes need compatible capabilities and evidence at each transition, not merely an updated request field.
 
 ## Common pitfalls
 
