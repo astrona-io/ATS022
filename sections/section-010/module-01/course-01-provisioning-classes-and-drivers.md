@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Provisioning, Classes And Drivers
 
+A claim requests storage, but no volume appears until the selected provisioner can fulfill it. StorageClass parameters, topology and the consumer's node choice can all participate. A Pending claim therefore needs provisioning evidence rather than repeated application restarts.
+
+## Learning objectives
+
+- Explain class selection and dynamic provisioning.
+- Distinguish expected delayed binding from failure.
+- Evaluate topology, expansion and driver capabilities.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 A team requests storage without asking an operator to create every volume manually. A StorageClass describes a storage offering and identifies a provisioner, with implementation-specific parameters. Dynamic provisioning uses a claim and class to create suitable storage when supported by the infrastructure.
 
 Static provisioning starts with a volume already prepared by an operator. Dynamic provisioning creates the backing resource in response to a claim. A claim can remain unbound when no suitable volume or working provisioning path is available. Merely creating a StorageClass does not install a provisioner or grant it access to an external storage account.
@@ -32,6 +46,25 @@ Immediate binding can select storage before the consuming Pod's location is know
 Suppose the application requires zone A and the requested storage is available only in zone B. More generic CPU capacity does not resolve the mismatch. The desired placement or storage offering must become compatible. If no consumer has been created under delayed binding, a waiting claim can be expected rather than a failure.
 
 A useful diagnosis traces class selection, provisioner availability, backing-resource creation, claim binding, attachment and mounting. Identify the last successful stage and the required location. Storage resource names and a Pending summary alone do not provide enough detail to choose a correct remedy.
+
+## Work through the decision
+
+A StorageClass describes a storage provisioning choice, including its provisioner and supported parameters. A provisioner creates or arranges the backing storage and corresponding volume objects. A Container Storage Interface (CSI) driver is a standardized integration between Kubernetes and storage systems; not every local practice provisioner demonstrates a production CSI backend.
+
+With `WaitForFirstConsumer`, binding or provisioning can wait until a consuming Pod provides placement context. An unused claim can therefore remain Pending without a defect. After a consumer exists, compare its scheduling constraints with allowed storage topology. A successful bind is another boundary: mounting, filesystem permissions and application writes can still fail later.
+
+```mermaid
+flowchart TB
+    C["Claim request"] --> S["Selected StorageClass"]
+    S --> P["Provisioner"]
+    N["Consumer placement context"] --> P
+    P --> V["Bound volume"]
+    V --> M["Node mount"]
+```
+
+Provisioning and mounting are separate operations, and some provisioning decisions need consumer placement first.
+
+You can now distinguish a storage request from provisioned and mounted storage. Diagnose the earliest unresolved boundary, while keeping backend-specific capabilities separate from the local practice example.
 
 ## Common pitfalls
 
