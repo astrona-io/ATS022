@@ -5,7 +5,9 @@ exam_objectives:
 ---
 # Manage persistent volumes and persistent volume claims
 
-This section covers manage persistent volumes and persistent volume claims. You will study Persistent Object Binding And Administration. The lessons explain the responsible components, configuration relationships and failure cases relevant to application development.
+A claim asks for a larger filesystem, but its provisioner does not support expansion. Editing requested capacity cannot create a missing backend capability. Storage administration starts with the contract that the provisioner and volume actually support.
+
+The explanations identify the responsible components, compare intended and observed state, and work through the decisions needed to preserve the requirement. Read the worked examples as reasoning about a proposed system; no environment is started by this section.
 
 Each module begins with its goals and ends with a summary. Reusable YAML knowledge checks follow the section summary and are registered separately for future presentation.
 
