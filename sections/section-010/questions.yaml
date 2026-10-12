@@ -1,0 +1,110 @@
+schema_version: 1
+kind: question_bank
+id: ats022-section-010
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: section
+  id: section-010
+  title: Implement storage classes and dynamic volume provisioning
+placement:
+  position: after
+  reading: sections/section-010/module-01/course-02-summary.md
+questions:
+- id: ats022-section-010-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain class selection and dynamic provisioning.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: What does a StorageClass connect a claim to?
+  options:
+  - id: a
+    text: The application image's build context
+    explanation: Image inputs are unrelated to class-based volume allocation.
+  - id: b
+    text: A provisioner and its supported allocation parameters
+    explanation: The class defines the storage provisioning contract.
+  - id: c
+    text: A universal Service port
+    explanation: Storage provisioning does not choose application listeners.
+  correct_option: b
+  explanation: The class defines the storage provisioning contract.
+- id: ats022-section-010-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Distinguish expected delayed binding from failure.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: A class uses WaitForFirstConsumer and its claim has no consumer yet. What can Pending mean?
+  options:
+  - id: a
+    text: Binding is waiting for consumer placement information
+    explanation: Delayed binding can coordinate topology with scheduling.
+  - id: b
+    text: The driver is necessarily broken
+    explanation: Pending can be expected under this binding mode.
+  - id: c
+    text: The API must have deleted the claim
+    explanation: A visible Pending claim remains an accepted object.
+  correct_option: a
+  explanation: Delayed binding can coordinate topology with scheduling.
+- id: ats022-section-010-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain class selection and dynamic provisioning.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: Why inspect the provisioner before assuming a claim can allocate storage?
+  options:
+  - id: a
+    text: The class title automatically supplies storage hardware
+    explanation: A resource definition does not create every dependency.
+  - id: b
+    text: Every class uses identical backend behavior
+    explanation: Driver capabilities and parameters differ.
+  - id: c
+    text: The named implementation must be installed and operational
+    explanation: Class selection does not itself create a functioning backend controller.
+  correct_option: c
+  explanation: Class selection does not itself create a functioning backend controller.
+- id: ats022-section-010-q04
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Evaluate topology, expansion and driver capabilities.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: A storage backend works only in one zone. What workload relationship matters?
+  options:
+  - id: a
+    text: Only the application's HTTP path
+    explanation: Request paths do not establish storage zone access.
+  - id: b
+    text: Consumer placement must fit supported storage topology
+    explanation: Volume location can constrain where usable attachment occurs.
+  - id: c
+    text: The character count of the claim's name
+    explanation: Name length does not define location compatibility.
+  correct_option: b
+  explanation: Volume location can constrain where usable attachment occurs.
+- id: ats022-section-010-q05
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Evaluate topology, expansion and driver capabilities.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: Does a CSI driver necessarily support every optional storage feature?
+  options:
+  - id: a
+    text: No; supported capabilities must be checked
+    explanation: Creation, expansion and snapshot support can differ.
+  - id: b
+    text: Yes; installing any driver guarantees all optional operations
+    explanation: The interface does not require universal capability support.
+  - id: c
+    text: Yes; a valid claim automatically implements backups
+    explanation: A claim does not create a backup system.
+  correct_option: a
+  explanation: Creation, expansion and snapshot support can differ.
