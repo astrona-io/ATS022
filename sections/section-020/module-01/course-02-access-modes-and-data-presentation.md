@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Access Modes And Data Presentation
 
+Two Pods on the same node may use a ReadWriteOnce volume, even though its name sounds like a single-Pod limit. Access mode describes a storage access constraint, not an application lock. Separate node access from concurrent writers.
+
+## Learning objectives
+
+- Compare ephemeral and persistent volume lifetimes.
+- Interpret access and volume modes.
+- Explain application concurrency limits.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 Two `probe` Pods need access to stored reports. Access modes describe supported mounting arrangements, not the application's transaction rules. ReadWriteOnce allows read-write mounting by one node, which can include several Pods on that node. It does not universally mean one Pod.
 
 ReadOnlyMany supports read-only mounting by many nodes. ReadWriteMany supports read-write mounting by many nodes where the storage implementation provides it. ReadWriteOncePod restricts a supported volume to a single Pod and requires compatible Container Storage Interface (CSI) support. Not every driver supports every access mode.
@@ -32,6 +46,26 @@ Filesystem mode presents mounted directories and files. Block mode presents a ra
 Capacity, performance and availability also differ from access mode. A share supporting many writers can still have insufficient throughput. A volume allowing one node can be attachable in a restricted zone. A large volume can retain data but still depend on one failure-prone device.
 
 A complete storage decision states the consumers, concurrency model, presentation, topology and recovery requirements. Then compare those needs with the supported class and driver behavior. This avoids treating one access-mode abbreviation as a full specification of safe application storage.
+
+## Work through the decision
+
+ReadWriteOnce permits read-write mounting by one node under the backend's supported semantics. It is not a promise that only one process or Pod writes. ReadWriteOncePod provides the stricter single-Pod access contract where the supported CSI driver and cluster features provide it. ReadWriteMany describes supported read-write access by multiple nodes, not safety for arbitrary shared-file application logic.
+
+Volume mode addresses another question. Filesystem mode exposes files through a mounted filesystem; Block mode exposes a raw block device through the supported device mapping. An application expecting directory paths cannot use a block presentation as though it already had files. Inspect mode and backend capability alongside access modes before changing the application.
+
+```mermaid
+flowchart TB
+    C["Claim access mode"] --> B["Backend capability"]
+    C --> N["Eligible mounting scope"]
+    V["Volume mode"] --> F["Filesystem or block presentation"]
+    N --> A["Application access"]
+    F --> A
+    B --> A
+```
+
+Mounting scope and data presentation constrain access, while concurrency correctness remains an application responsibility.
+
+You can now distinguish mounting permission from safe concurrent use. A valid access mode still requires compatible backend support and an application that handles shared data correctly.
 
 ## Common pitfalls
 

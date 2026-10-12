@@ -5,6 +5,20 @@ exam_objectives:
 ---
 # Reclaim Policies And Recovery
 
+Deleting a Pod and deleting its storage claim are different operations. A retained backend may survive one operation while a Delete reclaim policy removes it after another. Determine ownership and policy before treating resource cleanup as harmless.
+
+## Learning objectives
+
+- Compare ephemeral and persistent volume lifetimes.
+- Interpret access and volume modes.
+- Explain application concurrency limits.
+
+## Before you start
+
+This chapter is standalone reading material; no running cluster or installed tools are required. A Pod is the Kubernetes unit for running one or more containers, and a namespace groups namespaced objects. Treat the worked configurations as teaching examples rather than recorded observations from a provisioned environment.
+
+## Responsible components and behavior
+
 The `probe` workload is removed, but its reports must be retained. Deleting a Pod, deleting its claim and deleting the underlying storage are different operations. A volume's reclaim policy controls what happens to the storage resource after its claim is released.
 
 With Retain, the released volume and underlying data require manual handling rather than automatic reclamation. An operator must assess the data and prepare any reuse. Retention does not automatically rebind the same data to every new claim or guarantee that the application can recover it without a procedure.
@@ -32,6 +46,24 @@ A backup must cover the important data and be usable in a realistic restore proc
 Replication can preserve operation after one device or member fails but also repeat accidental or malicious changes. Historical recovery requires an appropriate earlier state, with retention and access controls. A retained PV is useful only if the operator can find it, mount it safely and recover meaningful application data.
 
 Before deletion, identify the data owner, governing lifecycle policies and acceptable recovery outcome. After restoration, verify application records rather than only successful mounting. Storage cleanup and recovery are data-management decisions, not interchangeable ways to remove a workload from a cluster.
+
+## Work through the decision
+
+A claim's binding connects an application request to a volume. When the claim is removed, the volume's reclaim policy determines the next storage lifecycle action under the provisioner's contract. `Retain` leaves storage for deliberate handling; it does not automatically bind the old data to a new claim or verify that an application can read it safely.
+
+The policy on an existing volume is the relevant evidence for that volume. Changing a StorageClass default affects subsequently provisioned volumes rather than rewriting every already bound object. Before cleanup, record the current claim-to-volume relationship and the backend's actual retention behavior. Recovery also needs compatible data formats, permissions and a tested application procedure.
+
+```mermaid
+flowchart TB
+    C["Claim deletion"] --> P["Volume reclaim policy"]
+    P --> R["Retain backing storage"]
+    P --> D["Delete through provisioner"]
+    R --> M["Manual recovery procedure"]
+```
+
+The reclaim policy governs storage handling after claim deletion; retention still needs deliberate recovery.
+
+You can now separate workload cleanup from storage deletion and recovery. A retention decision preserves an opportunity to recover data, while backups and a tested restoration process establish how that recovery can succeed.
 
 ## Common pitfalls
 
