@@ -1,0 +1,110 @@
+schema_version: 1
+kind: question_bank
+id: ats022-section-030
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: section
+  id: section-030
+  title: Manage persistent volumes and persistent volume claims
+placement:
+  position: after
+  reading: sections/section-030/module-01/course-02-summary.md
+questions:
+- id: ats022-section-030-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain PV and PVC scope and matching.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: Which scope relationship is correct for ordinary PV and PVC use?
+  options:
+  - id: a
+    text: A PVC in any namespace automatically satisfies a same-named reference
+    explanation: Ordinary consumers need the relevant namespaced claim.
+  - id: b
+    text: A PV is cluster-scoped and its consuming PVC is namespaced
+    explanation: The objects have distinct scopes and matching responsibilities.
+  - id: c
+    text: Both are always independent per container
+    explanation: Their resource scopes are not container-local definitions.
+  correct_option: b
+  explanation: The objects have distinct scopes and matching responsibilities.
+- id: ats022-section-030-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain PV and PVC scope and matching.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: A volume has adequate size but incompatible access mode. What can happen?
+  options:
+  - id: a
+    text: The claim may not bind to that volume
+    explanation: Matching includes more than capacity alone.
+  - id: b
+    text: The controller universally ignores access requirements
+    explanation: Access declarations participate in the storage contract.
+  - id: c
+    text: The volume automatically changes into a Service
+    explanation: Resource kind does not change to repair matching.
+  correct_option: a
+  explanation: Matching includes more than capacity alone.
+- id: ats022-section-030-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Evaluate expansion and safe retained-volume reuse.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: A claim's capacity request increases. What establishes usable expansion?
+  options:
+  - id: a
+    text: Only editing the PV's displayed capacity number
+    explanation: Declared capacity can diverge from the actual backend.
+  - id: b
+    text: Only adding replicas to the frontend
+    explanation: Application scale does not expand storage capacity.
+  - id: c
+    text: Supported class and driver behavior plus completed backend and applicable filesystem work
+    explanation: An accepted numeric change alone does not prove usable storage growth.
+  correct_option: c
+  explanation: An accepted numeric change alone does not prove usable storage growth.
+- id: ats022-section-030-q04
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Diagnose provisioning, attachment and mount stages.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: A volume is provisioned but cannot be mounted on a node. What is the relevant stage?
+  options:
+  - id: a
+    text: Only the public DNS record
+    explanation: External naming does not mount the volume.
+  - id: b
+    text: Node attachment or mounting and its dependencies
+    explanation: Provisioning success does not prove every later storage operation succeeds.
+  - id: c
+    text: Only chart rendering syntax
+    explanation: The failure is later than ordinary manifest composition.
+  correct_option: b
+  explanation: Provisioning success does not prove every later storage operation succeeds.
+- id: ats022-section-030-q05
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Evaluate expansion and safe retained-volume reuse.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: A retained volume will be reused for another tenant. What must be reviewed?
+  options:
+  - id: a
+    text: Residual data, ownership and safe backend handling
+    explanation: Retention is not proof that reassignment preserves confidentiality.
+  - id: b
+    text: Only whether its name is short
+    explanation: Names do not erase prior data.
+  - id: c
+    text: An assumption that Retain automatically wipes all content
+    explanation: Retain preserves storage rather than universally sanitizing it.
+  correct_option: a
+  explanation: Retention is not proof that reassignment preserves confidentiality.

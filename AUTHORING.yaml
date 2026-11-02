@@ -1,0 +1,88 @@
+version: 1
+approval: CKA requested 2026-10-11; established reading-only scope
+course:
+  id: ATS022
+  certification:
+    name: Certified Kubernetes Administrator
+    code: CKA
+    provider: CNCF / Linux Foundation
+    domain: Storage
+    weight: 10
+    competencies:
+    - Implement storage classes and dynamic volume provisioning
+    - Configure volume types, access modes and reclaim policies
+    - Manage persistent volumes and persistent volume claims
+defaults:
+  playground: false
+  module_lab: false
+  capstone: false
+  section_quiz: true
+  final_quiz: true
+assessment_format: YAML question banks, schema version 1; indexed in assessments/index.yaml
+sections:
+- id: section-010
+  title: Implement storage classes and dynamic volume provisioning
+  curriculum_item: Implement storage classes and dynamic volume provisioning
+  capstone: false
+  section_quiz: true
+  modules:
+  - id: module-01
+    title: Storage Classes And Provisioning Decisions
+    objectives:
+    - Explain class selection and dynamic provisioning.
+    - Distinguish expected delayed binding from failure.
+    - Evaluate topology, expansion and driver capabilities.
+    - Identify retention consequences before administrative changes.
+    outline:
+    - Provisioning, Classes And Drivers
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+      adapted_from: ATS038/sections/section-040/module-01/course-02-provisioning-classes-and-drivers.md
+- id: section-020
+  title: Configure volume types, access modes and reclaim policies
+  curriculum_item: Configure volume types, access modes and reclaim policies
+  capstone: false
+  section_quiz: true
+  modules:
+  - id: module-01
+    title: Volume Lifetime, Access And Reclaim
+    objectives:
+    - Compare ephemeral and persistent volume lifetimes.
+    - Interpret access and volume modes.
+    - Explain application concurrency limits.
+    - Predict reclaim and recovery consequences.
+    outline:
+    - Storage Lifecycles And Claims
+    - Access Modes And Data Presentation
+    - Reclaim Policies And Recovery
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+      adapted_from: ATS038/sections/section-040/module-01/course-01-storage-lifecycles-and-claims.md
+    - reading: sections/section-020/module-01/course-02-access-modes-and-data-presentation.md
+      adapted_from: ATS038/sections/section-040/module-02/course-01-access-modes-and-data-presentation.md
+    - reading: sections/section-020/module-01/course-03-reclaim-policies-and-recovery.md
+      adapted_from: ATS038/sections/section-040/module-02/course-02-reclaim-policies-and-recovery.md
+- id: section-030
+  title: Manage persistent volumes and persistent volume claims
+  curriculum_item: Manage persistent volumes and persistent volume claims
+  capstone: false
+  section_quiz: true
+  modules:
+  - id: module-01
+    title: Persistent Object Binding And Administration
+    objectives:
+    - Explain PV and PVC scope and matching.
+    - Distinguish static binding from dynamic allocation.
+    - Diagnose provisioning, attachment and mount stages.
+    - Evaluate expansion and safe retained-volume reuse.
+    outline:
+    - Binding, Expansion And Administrative Storage Decisions
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+      adapted_from: null

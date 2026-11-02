@@ -1,0 +1,111 @@
+schema_version: 1
+kind: question_bank
+id: ats022-domain-review
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: domain
+  id: domain-review
+  title: Storage
+placement:
+  position: after
+  reading: sections/section-030/module-01/course-02-summary.md
+questions:
+- id: ats022-domain-review-q01
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish expected delayed binding from failure.
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: A claim waits for a consumer under delayed binding. Why avoid replacing the storage driver immediately?
+  options:
+  - id: a
+    text: Changing drivers always preserves every backend data contract
+    explanation: A replacement can change capabilities and data relationships.
+  - id: b
+    text: The Pending state can be expected until placement constraints are known
+    explanation: The binding mode can intentionally wait for consumer information.
+  - id: c
+    text: Every Pending claim proves the driver has crashed
+    explanation: That ignores delayed-binding semantics.
+  correct_option: b
+  explanation: The binding mode can intentionally wait for consumer information.
+- id: ats022-domain-review-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Compare ephemeral and persistent volume lifetimes.
+  source_readings:
+  - sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+  prompt: Temporary files survive a container restart but disappear after Pod replacement. Which lifetime
+    fits?
+  options:
+  - id: a
+    text: Pod-scoped emptyDir storage
+    explanation: Its lifetime differs from a container attempt and ends with the Pod.
+  - id: b
+    text: A universal application backup
+    explanation: The observation does not describe independent recovery storage.
+  - id: c
+    text: A permanent registry layer
+    explanation: Runtime files are not automatically committed into an image layer.
+  correct_option: a
+  explanation: Its lifetime differs from a container attempt and ends with the Pod.
+- id: ats022-domain-review-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain application concurrency limits.
+  source_readings:
+  - sections/section-020/module-01/course-02-access-modes-and-data-presentation.md
+  prompt: Why consider application coordination even with a suitable shared access mode?
+  options:
+  - id: a
+    text: Access modes automatically serialize all business transactions
+    explanation: That exceeds the declaration's role.
+  - id: b
+    text: Shared access means corruption is impossible
+    explanation: Concurrency can still be unsafe.
+  - id: c
+    text: Storage access does not implement every concurrent write protocol
+    explanation: The application must protect its own consistency.
+  correct_option: c
+  explanation: The application must protect its own consistency.
+- id: ats022-domain-review-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Diagnose provisioning, attachment and mount stages.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: A provisioned volume cannot attach in the consumer's selected location. What should be compared?
+  options:
+  - id: a
+    text: Only the number of image layers
+    explanation: Artifact structure does not define storage topology.
+  - id: b
+    text: Storage topology and workload placement requirements
+    explanation: Usable capacity must fit the consumer's supported location.
+  - id: c
+    text: Only the HTML response title
+    explanation: Request presentation does not establish volume attachment.
+  correct_option: b
+  explanation: Usable capacity must fit the consumer's supported location.
+- id: ats022-domain-review-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Evaluate expansion and safe retained-volume reuse.
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  prompt: What distinguishes retained storage from a demonstrated recovery plan?
+  options:
+  - id: a
+    text: Recovery needs suitable backups and a supported way to restore required data
+    explanation: Retention alone does not prove earlier corruption or deletion can be reversed.
+  - id: b
+    text: A retained resource always contains every past version
+    explanation: That is not its universal contract.
+  - id: c
+    text: Any unchanged volume name proves recovery succeeded
+    explanation: Naming cannot demonstrate restored application data.
+  correct_option: a
+  explanation: Retention alone does not prove earlier corruption or deletion can be reversed.

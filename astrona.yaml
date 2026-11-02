@@ -1,8 +1,9 @@
-# Preparation scaffold. Technical pages stay draft until authoring and review.
 training:
   id: ATS022
   title: 'CKA: Storage'
-  description: Preparation scaffold for Storage. Lessons and environments are planned.
+  description: Detailed reading lessons and reusable YAML knowledge checks covering
+    the CKA domain. No new labs or playgrounds. Technical content remains draft for
+    review.
   certification:
     name: Certified Kubernetes Administrator
     code: CKA
@@ -16,7 +17,7 @@ training:
 modules:
 - id: module-intro
   title: Introduction
-  description: Planned introduction and authoring status.
+  description: Audience, learning method, reading requirements and authoring process.
   content:
   - type: reading
     title: Introduction
@@ -32,31 +33,143 @@ modules:
     path: sections/intro/course-03-how-this-course-is-made.md
 - id: module-010
   title: Implement storage classes and dynamic volume provisioning
-  description: Planned coverage of this curriculum objective.
+  description: Developed explanations and application reasoning for Implement storage
+    classes and dynamic volume provisioning.
+  status: alpha
   content:
-  - type: reading
-    title: Section Overview
-    path: sections/section-010/README.md
   - type: reading
     title: Implement storage classes and dynamic volume provisioning
+    path: sections/section-010/README.md
+  - type: reading
+    title: Storage Classes And Provisioning Decisions
     path: sections/section-010/module-01/course.md
+  - type: reading
+    title: Provisioning, Classes And Drivers
+    path: sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  - type: reading
+    title: Provision Through A Delayed-Binding StorageClass — Task
+    path: sections/section-010/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Provision Through A Delayed-Binding StorageClass
+    path: sections/section-010/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: storage-class
+    task_kind: build
+    learning_goals:
+    - Create a class and claim whose storage binds when its consumer can be scheduled.
+    tags:
+    - cka
+    - storage-class
+  - type: reading
+    title: Provision Through A Delayed-Binding StorageClass — Solution
+    path: sections/section-010/module-01/labs/lab-01/solution.md
+  - type: reading
+    title: 'Guided Practice: Provision Through A Delayed-Binding StorageClass'
+    path: sections/section-010/module-01/course-02-guided-practice.md
+  - type: reading
+    title: Summary
+    path: sections/section-010/module-01/course-03-summary.md
 - id: module-020
   title: Configure volume types, access modes and reclaim policies
-  description: Planned coverage of this curriculum objective.
+  description: Developed explanations and application reasoning for Configure volume
+    types, access modes and reclaim policies.
+  status: alpha
   content:
-  - type: reading
-    title: Section Overview
-    path: sections/section-020/README.md
   - type: reading
     title: Configure volume types, access modes and reclaim policies
+    path: sections/section-020/README.md
+  - type: reading
+    title: Volume Lifetime, Access And Reclaim
     path: sections/section-020/module-01/course.md
+  - type: reading
+    title: Storage Lifecycles And Claims
+    path: sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+  - type: reading
+    title: Preserve Claim Data Across Pod Replacement — Task
+    path: sections/section-020/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Preserve Claim Data Across Pod Replacement
+    path: sections/section-020/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: persistent-storage
+    task_kind: build
+    learning_goals:
+    - Observe persistent data surviving replacement while Pod-lifetime scratch data
+      disappears.
+    tags:
+    - cka
+    - persistent-storage
+  - type: reading
+    title: Preserve Claim Data Across Pod Replacement — Solution
+    path: sections/section-020/module-01/labs/lab-01/solution.md
+  - type: reading
+    title: Access Modes And Data Presentation
+    path: sections/section-020/module-01/course-02-access-modes-and-data-presentation.md
+  - type: reading
+    title: Reclaim Policies And Recovery
+    path: sections/section-020/module-01/course-03-reclaim-policies-and-recovery.md
+  - type: reading
+    title: Retain A Bound Volume Safely — Task
+    path: sections/section-020/module-01/labs/lab-02/question.md
+  - type: lab
+    title: Retain A Bound Volume Safely
+    path: sections/section-020/module-01/labs/lab-02
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: reclaim-policy
+    task_kind: build
+    learning_goals:
+    - Change a bound volume reclaim policy while preserving its active claim and consumer.
+    tags:
+    - cka
+    - reclaim-policy
+  - type: reading
+    title: Retain A Bound Volume Safely — Solution
+    path: sections/section-020/module-01/labs/lab-02/solution.md
+  - type: reading
+    title: 'Guided Practice: Preserve Claim Data Across Pod Replacement'
+    path: sections/section-020/module-01/course-04-guided-practice.md
+  - type: reading
+    title: Summary
+    path: sections/section-020/module-01/course-05-summary.md
 - id: module-030
   title: Manage persistent volumes and persistent volume claims
-  description: Planned coverage of this curriculum objective.
+  description: Developed explanations and application reasoning for Manage persistent
+    volumes and persistent volume claims.
+  status: alpha
   content:
   - type: reading
-    title: Section Overview
+    title: Manage persistent volumes and persistent volume claims
     path: sections/section-030/README.md
   - type: reading
-    title: Manage persistent volumes and persistent volume claims
+    title: Persistent Object Binding And Administration
     path: sections/section-030/module-01/course.md
+  - type: reading
+    title: Binding, Expansion And Administrative Storage Decisions
+    path: sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  - type: reading
+    title: Bind A Claim To An Existing Volume — Task
+    path: sections/section-030/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Bind A Claim To An Existing Volume
+    path: sections/section-030/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: static-pv-binding
+    task_kind: build
+    learning_goals:
+    - Bind a named claim without invoking the default dynamic provisioner.
+    tags:
+    - cka
+    - static-pv-binding
+  - type: reading
+    title: Bind A Claim To An Existing Volume — Solution
+    path: sections/section-030/module-01/labs/lab-01/solution.md
+  - type: reading
+    title: 'Guided Practice: Bind A Claim To An Existing Volume'
+    path: sections/section-030/module-01/course-02-guided-practice.md
+  - type: reading
+    title: Summary
+    path: sections/section-030/module-01/course-03-summary.md
