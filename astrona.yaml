@@ -35,7 +35,7 @@ modules:
   title: Implement storage classes and dynamic volume provisioning
   description: Developed explanations and application reasoning for Implement storage
     classes and dynamic volume provisioning.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Implement storage classes and dynamic volume provisioning
@@ -74,7 +74,7 @@ modules:
   title: Configure volume types, access modes and reclaim policies
   description: Developed explanations and application reasoning for Configure volume
     types, access modes and reclaim policies.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Configure volume types, access modes and reclaim policies
@@ -138,7 +138,7 @@ modules:
   title: Manage persistent volumes and persistent volume claims
   description: Developed explanations and application reasoning for Manage persistent
     volumes and persistent volume claims.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Manage persistent volumes and persistent volume claims
