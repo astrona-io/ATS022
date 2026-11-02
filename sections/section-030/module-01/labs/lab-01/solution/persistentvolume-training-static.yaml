@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: training-static
+spec:
+  capacity:
+    storage: 128Mi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ''
+  hostPath:
+    path: /var/local/training-static
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-data
+  namespace: starfleet
+spec:
+  volumeName: training-static
+  storageClassName: ''
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-reader
+  namespace: starfleet
+spec:
+  restartPolicy: Never
+  containers:
+  - name: reader
+    image: docker.io/library/busybox:1.37.0
+    command:
+    - sh
+    - -c
+    - sleep 3600
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  nodeSelector:
+    kubernetes.io/hostname: astro-ats-022-lab-030-01-01-control-plane
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: static-data
+  tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
