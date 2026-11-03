@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Diagnose Pending Claims And Provisioning Failures (PLAYGROUND). UNTESTED.
+# A clean sandbox with claims that are Pending on purpose. No task, no grading.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-playground-010-03
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  manifests:
+    - name: start
+      type: file
+      source: manifests/start.yaml
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: archive-a
+  labels:
+    tier: cold
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /var/local/training/archive-a
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: archive-b
+  labels:
+    tier: hot
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /var/local/training/archive-b
+    type: DirectoryOrCreate
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: training-grow
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: telemetry
+  namespace: starfleet
+spec:
+  storageClassName: training-grow
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-writer
+  namespace: starfleet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telemetry-writer
+  template:
+    metadata:
+      labels:
+        app: telemetry-writer
+    spec:
+      containers:
+      - name: writer
+        image: docker.io/library/busybox:1.37.0
+        command:
+        - sh
+        - -c
+        - echo ready > /data/ready; sleep 36000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: telemetry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay
+  namespace: starfleet
+spec:
+  clusterIP: None
+  selector:
+    app: relay
+  ports:
+  - name: placeholder
+    port: 80
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: retired-data
+  namespace: starfleet
+spec:
+  storageClassName: standard
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: retired-holder
+  namespace: starfleet
+spec:
+  containers:
+  - name: holder
+    image: docker.io/library/busybox:1.37.0
+    command:
+    - sh
+    - -c
+    - sleep 36000
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: retired-data

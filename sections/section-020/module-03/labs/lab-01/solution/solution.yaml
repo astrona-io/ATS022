@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: feed-single
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadWriteOncePod
+  storageClassName: ""
+  volumeName: training-single
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: feed-shared
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: ""
+  volumeName: training-readonly
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: feed-writer
+  namespace: starfleet
+spec:
+  containers:
+    - name: writer
+      image: docker.io/library/busybox:1.37.0
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: feed-single
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: feed-second
+  namespace: starfleet
+spec:
+  containers:
+    - name: writer
+      image: docker.io/library/busybox:1.37.0
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: feed-single
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: feed-reader
+  namespace: starfleet
+spec:
+  containers:
+    - name: reader
+      image: docker.io/library/busybox:1.37.0
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: feed-shared
+        readOnly: true

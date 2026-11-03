@@ -11,7 +11,7 @@ scope:
   title: Implement storage classes and dynamic volume provisioning
 placement:
   position: after
-  reading: sections/section-010/module-01/course-02-summary.md
+  reading: sections/section-010/module-01/course-03-summary.md
 questions:
 - id: ats022-section-010-q01
   type: single_choice

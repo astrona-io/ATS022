@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Repair Pending Claims (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-010-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: two claims in starfleet that are Pending for different
+# reasons, each with a Pod that uses it. The faults are left in place.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the broken claims and their Pods
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: reports-claim-bound
+      description: The claim reports is bound through a class with a running provisioner
+      type: file
+      source: validation/validate-reports-claim-bound.sh
+      hint: The claim names a class that does not exist and storageClassName cannot be edited. Create the claim again with a class that exists, or create the missing class.
+    - name: telemetry-claim-bound
+      description: The claim telemetry is bound through a class with a running provisioner
+      type: file
+      source: validation/validate-telemetry-claim-bound.sh
+      hint: The class training-offline names a provisioner that nobody serves, and its provisioner field cannot change. Use the class standard in a new claim.
+    - name: writers-running
+      description: Both Pods run and wrote /data/ok.txt
+      type: file
+      source: validation/validate-writers-running.sh
+      hint: A Pod's volumes cannot be edited. Delete the Pod and create it again with the same name when you replace its claim.
+    - name: nothing-else-changed
+      description: The class training-offline still exists and no claim is Pending
+      type: file
+      source: validation/validate-nothing-else-changed.sh
+      hint: Fix the claims, not the class. Do not delete training-offline.
+
+teardown:
+  keepCluster: false

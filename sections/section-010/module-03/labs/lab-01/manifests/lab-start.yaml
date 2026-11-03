@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: outpost
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: training-offline
+provisioner: example.com/no-such-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: reports
+  namespace: starfleet
+spec:
+  storageClassName: standard-fast
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: telemetry
+  namespace: starfleet
+spec:
+  storageClassName: training-offline
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reports-writer
+  namespace: starfleet
+spec:
+  containers:
+  - name: writer
+    image: docker.io/library/busybox:1.37.0
+    command: ["sh", "-c", "echo ok > /data/ok.txt && sleep 3600"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: reports
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: telemetry-writer
+  namespace: starfleet
+spec:
+  containers:
+  - name: writer
+    image: docker.io/library/busybox:1.37.0
+    command: ["sh", "-c", "echo ok > /data/ok.txt && sleep 3600"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: telemetry

@@ -1,0 +1,125 @@
+{
+  "context": "kind-astro-ats-022-playground-030-01",
+  "resources": [
+    {
+      "kind": "persistentvolume",
+      "name": "training-static",
+      "namespace": "",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolume",
+        "metadata": {
+          "name": "training-static"
+        },
+        "spec": {
+          "capacity": {
+            "storage": "128Mi"
+          },
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+          "persistentVolumeReclaimPolicy": "Retain",
+          "storageClassName": "",
+          "hostPath": {
+            "path": "/var/local/training-static",
+            "type": "DirectoryOrCreate"
+          }
+        }
+      }
+    },
+    {
+      "kind": "persistentvolumeclaim",
+      "name": "static-data",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "PersistentVolumeClaim",
+        "metadata": {
+          "name": "static-data",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "volumeName": "training-static",
+          "storageClassName": "",
+          "accessModes": [
+            "ReadWriteOnce"
+          ],
+          "resources": {
+            "requests": {
+              "storage": "128Mi"
+            }
+          }
+        }
+      },
+      "state": "pvc"
+    },
+    {
+      "kind": "pod",
+      "name": "static-reader",
+      "namespace": "starfleet",
+      "expected": {
+        "apiVersion": "v1",
+        "kind": "Pod",
+        "metadata": {
+          "name": "static-reader",
+          "namespace": "starfleet"
+        },
+        "spec": {
+          "restartPolicy": "Never",
+          "containers": [
+            {
+              "name": "reader",
+              "image": "docker.io/library/busybox:1.37.0",
+              "command": [
+                "sh",
+                "-c",
+                "sleep 3600"
+              ],
+              "volumeMounts": [
+                {
+                  "name": "data",
+                  "mountPath": "/data"
+                }
+              ]
+            }
+          ],
+          "nodeSelector": {
+            "kubernetes.io/hostname": "astro-ats-022-playground-030-01-control-plane"
+          },
+          "volumes": [
+            {
+              "name": "data",
+              "persistentVolumeClaim": {
+                "claimName": "static-data"
+              }
+            }
+          ],
+          "tolerations": [
+            {
+              "key": "node-role.kubernetes.io/control-plane",
+              "operator": "Exists",
+              "effect": "NoSchedule"
+            }
+          ]
+        }
+      },
+      "state": "pod"
+    }
+  ],
+  "behavior": [
+    {
+      "args": [
+        "kubectl",
+        "-n",
+        "starfleet",
+        "exec",
+        "static-reader",
+        "--",
+        "sh",
+        "-c",
+        "printf bound > /data/result && cat /data/result"
+      ],
+      "equals": "bound"
+    }
+  ]
+}

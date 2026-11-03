@@ -1,0 +1,252 @@
+# Knowledge check for section 020. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats022-020
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: "Volume Types, Access Modes And Reclaim Policies"
+questions:
+  - id: ats022-020-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Distinguish data that lives as long as the Pod from data that outlives it"
+    source_readings:
+      - sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+    prompt: |-
+      A Pod writes a cache to an `emptyDir` volume and its results to a PersistentVolumeClaim. The Pod is deleted and a new Pod is created with the same spec. What is true?
+    options:
+      - id: a
+        text: "The cache and the results are both gone."
+        explanation: "An `emptyDir` is removed when the Pod is removed from the node, so the claim is not what is lost."
+      - id: b
+        text: "The cache is gone and the results are still in the claim's volume."
+        explanation: "Correct. An `emptyDir` lives as long as the Pod. A claim is a separate object that is not deleted with the Pod, so its data remains."
+      - id: c
+        text: "The cache is still there because `emptyDir` is stored on the node."
+        explanation: "The node directory of an `emptyDir` is deleted with the Pod."
+      - id: d
+        text: "The results are gone because a claim is deleted with its Pod."
+        explanation: "A PersistentVolumeClaim is its own API object and is not owned by the Pod."
+    correct_option: b
+    explanation: "Correct. An `emptyDir` lives as long as the Pod. A claim is a separate object that is not deleted with the Pod, so its data remains."
+
+  - id: ats022-020-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose a volume type for scratch space shared between containers"
+    source_readings:
+      - sections/section-020/module-02/course-01-scratch-space-and-node-paths.md
+    prompt: |-
+      Two containers in one Pod must exchange files, and the files must be lost when the Pod ends. Which volume type fits?
+    options:
+      - id: a
+        text: "`hostPath` pointing at `/tmp`."
+        explanation: "A `hostPath` ties the Pod to node files that outlive the Pod and are shared with other Pods on the node."
+      - id: b
+        text: "`emptyDir` mounted in both containers."
+        explanation: "Correct. An `emptyDir` is created empty with the Pod, can be mounted by every container in it, and is deleted with the Pod."
+      - id: c
+        text: "A `configMap` volume mounted in both containers."
+        explanation: "A `configMap` volume is read-only content from an API object, not writable scratch space."
+      - id: d
+        text: "A PersistentVolumeClaim with `Retain`."
+        explanation: "A claim with `Retain` keeps data after the Pod, the opposite of the requirement."
+    correct_option: b
+    explanation: "Correct. An `emptyDir` is created empty with the Pod, can be mounted by every container in it, and is deleted with the Pod."
+
+  - id: ats022-020-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "State what the reclaim policy controls"
+    source_readings:
+      - sections/section-020/module-04/course-01-reclaim-policy-and-claim-deletion.md
+    prompt: |-
+      When is the `persistentVolumeReclaimPolicy` of a PersistentVolume applied?
+    options:
+      - id: a
+        text: "When the Pod that uses the volume is deleted."
+        explanation: "Deleting the Pod does not release the claim, so the policy is not applied."
+      - id: b
+        text: "When the PersistentVolumeClaim bound to the volume is deleted."
+        explanation: "Correct. The policy decides what happens to the volume and its data after its claim is deleted: `Delete` removes them, `Retain` keeps the volume as `Released`."
+      - id: c
+        text: "When the volume is created."
+        explanation: "Creation does not apply a reclaim policy; the policy is only read at release time."
+      - id: d
+        text: "When the node that holds the data is drained."
+        explanation: "A drain evicts Pods and does not touch the volume's policy."
+    correct_option: b
+    explanation: "Correct. The policy decides what happens to the volume and its data after its claim is deleted: `Delete` removes them, `Retain` keeps the volume as `Released`."
+
+  - id: ats022-020-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain how a memory-backed emptyDir is accounted"
+    source_readings:
+      - sections/section-020/module-02/course-01-scratch-space-and-node-paths.md
+    prompt: |-
+      A container writes 200Mi to an `emptyDir` with `medium: Memory` and `sizeLimit: 64Mi`. What does the cluster do?
+    options:
+      - id: a
+        text: "Nothing; the limit applies only to disk-backed volumes."
+        explanation: "`sizeLimit` is set on a memory-backed volume and is enforced."
+      - id: b
+        text: "The write succeeds because `Memory` volumes have no limit."
+        explanation: "The limit applies, so the 200Mi are not allowed."
+      - id: c
+        text: "The volume is limited to 64Mi and writes beyond that fail with no space left."
+        explanation: "Correct. The memory-backed volume is sized to the `sizeLimit`, so writes beyond 64Mi fail. Memory used by the volume also counts against container memory."
+      - id: d
+        text: "The `sizeLimit` is rejected at admission for a `Memory` volume."
+        explanation: "`sizeLimit` is valid on a `Memory` volume."
+    correct_option: c
+    explanation: "Correct. The memory-backed volume is sized to the `sizeLimit`, so writes beyond 64Mi fail. Memory used by the volume also counts against container memory."
+
+  - id: ats022-020-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Combine a ConfigMap and a Secret in one mount with a file mode"
+    source_readings:
+      - sections/section-020/module-02/course-02-configuration-secrets-and-projected-volumes.md
+    prompt: |-
+      A container must read a ConfigMap and a Secret from one directory, and the Secret file must be mode 0400. Which volume does this?
+    options:
+      - id: a
+        text: "Two volumes of type `configMap` and `secret` mounted at the same `mountPath`."
+        explanation: "Two mounts cannot share a `mountPath`."
+      - id: b
+        text: "One `projected` volume with a `configMap` source and a `secret` source and `mode: 0400` on the Secret item."
+        explanation: "Correct. A `projected` volume merges several sources into one directory, and an item `mode` sets the permission of that file."
+      - id: c
+        text: "One `emptyDir` with `defaultMode: 0400`."
+        explanation: "An `emptyDir` has no `defaultMode` and does not read API objects."
+      - id: d
+        text: "One `downwardAPI` volume with both objects listed."
+        explanation: "A `downwardAPI` volume exposes Pod fields, not ConfigMaps or Secrets."
+    correct_option: b
+    explanation: "Correct. A `projected` volume merges several sources into one directory, and an item `mode` sets the permission of that file."
+
+  - id: ats022-020-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know which mounts receive ConfigMap updates"
+    source_readings:
+      - sections/section-020/module-02/course-02-configuration-secrets-and-projected-volumes.md
+    prompt: |-
+      A ConfigMap is edited while a Pod uses it. One container mounts it as a normal volume and another mounts a single key with `subPath`. What happens?
+    options:
+      - id: a
+        text: "Both containers see the new value after the kubelet sync."
+        explanation: "A `subPath` mount is a bind of one file and is not refreshed."
+      - id: b
+        text: "The normal mount is updated after the kubelet sync and the `subPath` mount keeps the old value."
+        explanation: "Correct. The kubelet refreshes the files of a normal ConfigMap volume. A `subPath` mount of the same volume is never updated."
+      - id: c
+        text: "Only the `subPath` mount is updated."
+        explanation: "The `subPath` mount is the one that does not change."
+      - id: d
+        text: "Neither is updated until the Pod restarts."
+        explanation: "The volume is refreshed without a restart, except for `subPath`."
+    correct_option: b
+    explanation: "Correct. The kubelet refreshes the files of a normal ConfigMap volume. A `subPath` mount of the same volume is never updated."
+
+  - id: ats022-020-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict the scheduling result for a second Pod on a ReadWriteOncePod claim"
+    source_readings:
+      - sections/section-020/module-03/course-02-single-pod-claims-and-read-only-mounts.md
+    prompt: |-
+      A claim has the access mode `ReadWriteOncePod`. One Pod uses it and runs. A second Pod that names the same claim is created. What is the result?
+    options:
+      - id: a
+        text: "Both Pods run if they are on the same node."
+        explanation: "`ReadWriteOnce` allows Pods on one node; `ReadWriteOncePod` does not."
+      - id: b
+        text: "The second Pod stays Pending because only one Pod may use the claim."
+        explanation: "Correct. `ReadWriteOncePod` allows a single Pod in the whole cluster, so the scheduler leaves the second Pod unscheduled."
+      - id: c
+        text: "The first Pod is restarted on another node."
+        explanation: "The first Pod is not touched."
+      - id: d
+        text: "The claim is bound again to a second volume."
+        explanation: "A claim binds to one volume and does not rebind for a second Pod."
+    correct_option: b
+    explanation: "Correct. `ReadWriteOncePod` allows a single Pod in the whole cluster, so the scheduler leaves the second Pod unscheduled."
+
+  - id: ats022-020-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the order of operations that keeps a dynamic volume's data"
+    source_readings:
+      - sections/section-020/module-04/course-01-reclaim-policy-and-claim-deletion.md
+    prompt: |-
+      A claim was provisioned by a StorageClass whose `reclaimPolicy` is `Delete`. You must remove the claim but keep the data. What is the correct order?
+    options:
+      - id: a
+        text: "Delete the claim, then patch the volume to `Retain`."
+        explanation: "After the claim is deleted, the `Delete` policy has already removed the volume."
+      - id: b
+        text: "Patch the volume to `Retain`, then delete the claim."
+        explanation: "Correct. The policy is read when the claim is released, so the PersistentVolume must be patched to `Retain` first."
+      - id: c
+        text: "Edit the StorageClass `reclaimPolicy` to `Retain`, then delete the claim."
+        explanation: "A StorageClass `reclaimPolicy` cannot be changed, and it does not change volumes that already exist."
+      - id: d
+        text: "Delete the Pod only; the volume is kept."
+        explanation: "Deleting the Pod leaves the claim and volume, but the question asks to remove the claim."
+    correct_option: b
+    explanation: "Correct. The policy is read when the claim is released, so the PersistentVolume must be patched to `Retain` first."
+
+  - id: ats022-020-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Reuse a Released volume"
+    source_readings:
+      - sections/section-020/module-04/course-02-released-volumes-and-rebinding.md
+    prompt: |-
+      A `Retain` volume is `Released`. A new claim names it with `volumeName` but stays Pending. What must be done?
+    options:
+      - id: a
+        text: "Delete the volume and create it again."
+        explanation: "Deleting the volume object does not keep the data that the policy was to preserve."
+      - id: b
+        text: "Clear `spec.claimRef` on the volume so that it becomes Available."
+        explanation: "Correct. A Released volume still references the old claim. Removing `spec.claimRef` makes it Available, and the new claim can bind to it."
+      - id: c
+        text: "Change the access mode of the new claim to `ReadWriteMany`."
+        explanation: "The access mode of the claim must match the volume; changing it does not clear the old reference."
+      - id: d
+        text: "Add the finalizer `kubernetes.io/pv-protection`."
+        explanation: "That finalizer only blocks deletion of a volume that is still bound."
+    correct_option: b
+    explanation: "Correct. A Released volume still references the old claim. Removing `spec.claimRef` makes it Available, and the new claim can bind to it."
+
+  - id: ats022-020-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Reason about the claim-protection finalizer when deleting a claim in use"
+    source_readings:
+      - sections/section-020/module-04/course-02-released-volumes-and-rebinding.md
+    prompt: |-
+      You delete a claim while a Pod still mounts it. The claim shows `Terminating`. What is the cause and what happens next?
+    options:
+      - id: a
+        text: "The `kubernetes.io/pvc-protection` finalizer holds the claim until no Pod uses it; the volume is released after that."
+        explanation: "Correct. The finalizer keeps a claim that is in use from being removed. When the Pod is deleted, the claim is removed and the volume follows its reclaim policy."
+      - id: b
+        text: "The reclaim policy blocks the delete until it is set to `Delete`."
+        explanation: "The reclaim policy is applied after the claim is gone, and it does not block deletion."
+      - id: c
+        text: "The volume has the phase `Failed`, so the delete is paused."
+        explanation: "The volume phase is not involved in this delay."
+      - id: d
+        text: "The scheduler holds the claim until the Pod is rescheduled."
+        explanation: "The scheduler does not own claim deletion."
+    correct_option: a
+    explanation: "Correct. The finalizer keeps a claim that is in use from being removed. When the Pod is deleted, the claim is removed and the volume follows its reclaim policy."

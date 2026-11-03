@@ -1,0 +1,258 @@
+# Knowledge check for section 030. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats022-030
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-030
+  title: "Manage Persistent Volumes And Persistent Volume Claims"
+questions:
+  - id: ats022-030-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain which fields a claim and a volume must match to bind"
+    source_readings:
+      - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+      - sections/section-030/module-03/course-01-how-a-claim-finds-its-volume.md
+    prompt: |-
+      A claim in `starfleet` asks for `100Mi`, `ReadWriteOnce` and the class `manual`. One unbound PersistentVolume exists with capacity `500Mi`, `ReadWriteOnce` and the class `manual`. What happens?
+    options:
+      - id: a
+        text: "The claim stays Pending because the sizes differ."
+        explanation: "A volume that is larger than the request can bind. Only a smaller volume cannot."
+      - id: b
+        text: "The claim binds the volume and reports the volume's full `500Mi` as its capacity."
+        explanation: "Correct. The volume is at least as big as the request and the class and access mode match, so the claim binds and the claim reports the bound volume's capacity."
+      - id: c
+        text: "The claim binds only after an administrator shrinks the volume to `100Mi`."
+        explanation: "Volumes are never shrunk to fit a claim."
+      - id: d
+        text: "The claim creates a new `100Mi` volume."
+        explanation: "Static binding does not provision. A new volume would need a StorageClass with a provisioner."
+    correct_option: b
+    explanation: "The volume matches the class and access mode and is large enough, so the claim binds it. The claim then shows the capacity of the volume."
+
+  - id: ats022-030-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Identify the setting that allows a claim to be resized"
+    source_readings:
+      - sections/section-030/module-02/course-01-grow-a-claim-through-its-storageclass.md
+    prompt: |-
+      A claim uses the class `fast` and the team edits `spec.resources.requests.storage` from `1Gi` to `2Gi`. The API server rejects the edit. Which setting is missing?
+    options:
+      - id: a
+        text: "`allowVolumeExpansion: true` on the StorageClass `fast`."
+        explanation: "Correct. A claim can only grow when its class allows expansion."
+      - id: b
+        text: "`persistentVolumeReclaimPolicy: Retain` on the volume."
+        explanation: "The reclaim policy controls what happens after release, not growth."
+      - id: c
+        text: "`volumeMode: Block` on the claim."
+        explanation: "The volume mode does not control resizing."
+      - id: d
+        text: "A `selector` on the claim."
+        explanation: "A selector chooses a volume at bind time. It has no effect on growth."
+    correct_option: a
+    explanation: "The class must set `allowVolumeExpansion: true`. Without it the API server refuses a larger request."
+
+  - id: ats022-030-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Recognize what a StatefulSet creates for each replica"
+    source_readings:
+      - sections/section-030/module-04/course-01-mount-claims-in-pods-deployments-and-statefulsets.md
+    prompt: |-
+      A StatefulSet `crew` has 3 replicas and a `volumeClaimTemplates` entry named `data`. Which claim names does it create?
+    options:
+      - id: a
+        text: "`data`, a single claim shared by all replicas."
+        explanation: "Each replica gets its own claim, not a shared one."
+      - id: b
+        text: "`crew-data-0`, `crew-data-1` and `crew-data-2`."
+        explanation: "The name starts with the template name, not the StatefulSet name."
+      - id: c
+        text: "`data-crew-0`, `data-crew-1` and `data-crew-2`."
+        explanation: "Correct. The claim name is the template name, the StatefulSet name and the ordinal."
+      - id: d
+        text: "No claims, until the Pods are bound to a PersistentVolume by hand."
+        explanation: "The StatefulSet controller creates the claims itself."
+    correct_option: c
+    explanation: "Claims are named `<template>-<statefulset>-<ordinal>`, so `data-crew-0` to `data-crew-2`."
+
+  - id: ats022-030-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use a label selector to choose between static volumes"
+    source_readings:
+      - sections/section-030/module-03/course-01-how-a-claim-finds-its-volume.md
+    prompt: |-
+      Two unbound volumes of class `manual` and `200Mi` exist: `crate-a` with `tier=slow` and `crate-b` with `tier=fast`. A claim must bind `crate-b`, and the team does not want to hard-code the volume name. What does the claim need?
+    options:
+      - id: a
+        text: "`spec.volumeName: crate-b`."
+        explanation: "This works, but it names the volume, which the team does not want."
+      - id: b
+        text: "`spec.storageClassName: crate-b`."
+        explanation: "The class name is not the volume name. It only has to equal the class of the volume."
+      - id: c
+        text: "`spec.selector.matchLabels` with `tier: fast`, plus the class `manual`."
+        explanation: "Correct. The selector limits candidates to volumes with the label, and `crate-b` is the only one."
+      - id: d
+        text: "A label `tier: fast` on the claim itself."
+        explanation: "Labels on the claim are not used for matching. The selector does the matching."
+    correct_option: c
+    explanation: "`selector.matchLabels` with `tier: fast` limits the candidates to `crate-b`, and the class and size already match."
+
+  - id: ats022-030-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Resize a claim whose class does not allow expansion"
+    source_readings:
+      - sections/section-030/module-02/course-01-grow-a-claim-through-its-storageclass.md
+      - sections/section-030/module-02/course-02-when-a-resize-is-refused-or-does-not-grow.md
+    prompt: |-
+      The claim `data` (class `training-grow`, `100Mi`) must become `300Mi` and keep its data. The class has no `allowVolumeExpansion` field. What is the correct order?
+    options:
+      - id: a
+        text: "Delete the claim and create a new one at `300Mi`."
+        explanation: "The old data would be lost with a Delete reclaim policy, and the task says to keep it."
+      - id: b
+        text: "Patch the claim first. The API server will enable expansion for the class."
+        explanation: "The API server never changes the class by itself, and the patch is refused."
+      - id: c
+        text: "Set `allowVolumeExpansion: true` on the class, then raise the request on the existing claim."
+        explanation: "Correct. The class field can be changed on an existing class, and the claim request can then grow in place."
+      - id: d
+        text: "Edit `status.capacity` of the claim to `300Mi`."
+        explanation: "Status is written by the control plane. Editing it does not resize anything."
+    correct_option: c
+    explanation: "Enable expansion on the class first, then edit the request of the same claim. The claim keeps its identity and data."
+
+  - id: ats022-030-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the correct fix for a claim that is Pending because of a mismatch"
+    source_readings:
+      - sections/section-030/module-03/course-01-how-a-claim-finds-its-volume.md
+      - sections/section-030/module-03/course-02-node-affinity-mount-options-and-pending-claims.md
+    prompt: |-
+      The claim `manifest` is Pending. It asks for class `archive`, `ReadWriteMany` and `5Gi`. The only free volume is `vault-1` with class `manual`, `ReadWriteOnce` and `2Gi`. The team accepts `1Gi` and `ReadWriteOnce`. What fixes it?
+    options:
+      - id: a
+        text: "Edit the claim to class `manual`, `ReadWriteOnce` and `1Gi`."
+        explanation: "The class and the access modes of a claim cannot be changed after creation, so this edit is refused."
+      - id: b
+        text: "Delete the claim and create it again with class `manual`, `ReadWriteOnce` and `1Gi`."
+        explanation: "Correct. The class and access modes are fixed, so a new claim is needed, and it fits `vault-1`."
+      - id: c
+        text: "Add `mountOptions` to the claim."
+        explanation: "`mountOptions` is a field of the volume, and it does not affect matching."
+      - id: d
+        text: "Label `vault-1` with `archive`."
+        explanation: "The class decides the match, not a label."
+    correct_option: b
+    explanation: "The class and access modes cannot be edited, so delete and recreate the claim with values that `vault-1` can satisfy."
+
+  - id: ats022-030-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a claim stays in Terminating"
+    source_readings:
+      - sections/section-030/module-04/course-02-storage-object-in-use-protection.md
+    prompt: |-
+      `kubectl delete pvc old-claim` returns, but the claim stays `Terminating`. `kubectl describe pvc old-claim` lists `Used By: holder`. What is the safest way to finish the deletion?
+    options:
+      - id: a
+        text: "Remove the `kubernetes.io/pvc-protection` finalizer with `kubectl patch`."
+        explanation: "This does finish the deletion, but it skips the protection that stops data loss while a Pod still uses the claim."
+      - id: b
+        text: "Run `kubectl delete pvc old-claim --force`."
+        explanation: "A forced delete of a claim does not stop the Pod from using it. The finalizer still applies."
+      - id: c
+        text: "Delete the volume that backs the claim."
+        explanation: "The volume has its own protection and is not the blocker."
+      - id: d
+        text: "Delete or stop the Pod `holder`."
+        explanation: "Correct. The finalizer is removed by the controller once no Pod uses the claim."
+    correct_option: d
+    explanation: "The `pvc-protection` finalizer holds the claim while a Pod uses it. Stop the Pod and the controller completes the deletion."
+
+  - id: ats022-030-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Diagnose a StatefulSet that cannot create its Pods"
+    source_readings:
+      - sections/section-030/module-04/course-01-mount-claims-in-pods-deployments-and-statefulsets.md
+    prompt: |-
+      A StatefulSet is created with `serviceName: crew-log`, but no Service of that name exists. The claims bind. What is the effect?
+    options:
+      - id: a
+        text: "The StatefulSet controller creates the Service for you."
+        explanation: "The controller never creates the Service."
+      - id: b
+        text: "The Pods are created, but they get no stable DNS names, because the headless Service is missing."
+        explanation: "Correct. The Service is needed for stable names, and the claims are not affected."
+      - id: c
+        text: "The claims stay Pending until the Service exists."
+        explanation: "Binding does not depend on the Service."
+      - id: d
+        text: "The Pods share one claim."
+        explanation: "Each replica still gets its own claim from the template."
+    correct_option: b
+    explanation: "`serviceName` has to refer to a headless Service you create. Without it the Pods run, but the stable per-Pod DNS names do not exist."
+
+  - id: ats022-030-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict the status of a resized claim on a provisioner that cannot resize"
+    source_readings:
+      - sections/section-030/module-02/course-02-when-a-resize-is-refused-or-does-not-grow.md
+    prompt: |-
+      A claim is raised from `100Mi` to `250Mi` on a class with `allowVolumeExpansion: true`, but the provisioner does not implement resizing. What does the cluster show?
+    options:
+      - id: a
+        text: "`spec.resources.requests.storage` is `250Mi`, and `status.capacity.storage` can stay at `100Mi`."
+        explanation: "Correct. The request is accepted, but the capacity changes only if the provisioner resizes the volume."
+      - id: b
+        text: "The edit is rolled back to `100Mi` after a minute."
+        explanation: "The API server does not roll back an accepted edit."
+      - id: c
+        text: "The claim becomes Lost."
+        explanation: "Lost is the phase of a claim whose volume is gone."
+      - id: d
+        text: "The Pod is restarted with a new volume of `250Mi`."
+        explanation: "Resizing does not replace the volume or restart the Pod by itself."
+    correct_option: a
+    explanation: "The request is stored in `spec`. The capacity in `status` follows only when the volume is resized."
+
+  - id: ats022-030-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Combine selector, size and access mode to predict which volume a claim binds"
+    source_readings:
+      - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+      - sections/section-030/module-03/course-01-how-a-claim-finds-its-volume.md
+      - sections/section-030/module-03/course-02-node-affinity-mount-options-and-pending-claims.md
+    prompt: |-
+      Free volumes, all class `manual`: `v1` (`200Mi`, RWO, `tier=fast`), `v2` (`1Gi`, RWO, `tier=fast`), `v3` (`200Mi`, RWX, `tier=fast`) and `v4` (`200Mi`, RWO, no label). A claim asks for `150Mi`, RWO, class `manual` and `matchLabels: tier: fast`. Which volume does it bind?
+    options:
+      - id: a
+        text: "`v2`, because it has the most free space."
+        explanation: "The smallest volume that fits wins, not the largest."
+      - id: b
+        text: "`v1`."
+        explanation: "Correct. `v1` has the label, the access mode and enough size. `v2` is larger, `v3` lacks RWO and `v4` has no label."
+      - id: c
+        text: "`v3`, because RWX includes RWO."
+        explanation: "A volume must offer every mode the claim requests, but an RWX-only volume does not list RWO."
+      - id: d
+        text: "`v4`, because unlabelled volumes are always preferred."
+        explanation: "The selector excludes volumes without the label."
+    correct_option: b
+    explanation: "Candidates are filtered by selector, class and mode. Among `v1` and `v2`, the smallest sufficient volume is chosen, which is `v1`."
+

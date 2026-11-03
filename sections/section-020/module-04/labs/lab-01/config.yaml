@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Reuse A Released Volume And Keep A Dynamic Volume (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-020-04
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create a Released PV and a dynamic claim in use
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: archive-rebound
+      description: training-archive is Bound to archive-restore
+      type: file
+      source: validation/validate-archive-rebound.sh
+      hint: A Released volume keeps its claimRef. Remove it, then create the claim with volumeName training-archive.
+    - name: archive-still-retained
+      description: The reused volume keeps Retain
+      type: file
+      source: validation/validate-archive-still-retained.sh
+      hint: Keep the same PV object. Do not change its reclaim policy.
+    - name: scratch-volume-survives
+      description: The volume behind scratch-data survives as Released with Retain
+      type: file
+      source: validation/validate-scratch-volume-survives.sh
+      hint: Patch the PV to Retain before the claim is deleted.
+    - name: scratch-objects-removed
+      description: scratch-data and scratch-writer are removed
+      type: file
+      source: validation/validate-scratch-objects-removed.sh
+      hint: Delete the Pod first, then the claim.
+
+teardown:
+  keepCluster: false

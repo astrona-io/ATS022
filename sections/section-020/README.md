@@ -17,3 +17,12 @@ Each module begins with its goals and ends with a summary. Reusable YAML knowled
 - Interpret access and volume modes.
 - Explain application concurrency limits.
 - Predict reclaim and recovery consequences.
+
+## Modules
+
+- Module 01 (existing): the original reading and lab.
+- Module 02: Choose Ephemeral And Projected Volume Types. Parts: Scratch Space And Node Paths; Configuration, Secrets And Projected Volumes. Lab: Combine Memory-Backed And Projected Volumes.
+- Module 03: Enforce Access Modes With ReadWriteOncePod. Parts: Volume Modes And Access Modes; Single-Pod Claims And Read-Only Mounts. Lab: Enforce A Single-Pod Claim And A Read-Only Mount.
+- Module 04: Release And Reuse Retained Volumes. Parts: Reclaim Policy And Claim Deletion; Released Volumes And Rebinding. Lab: Reuse A Released Volume And Keep A Dynamic Volume.
+- Capstone: Volume Types, Access Modes And Reclaim Handling.
+- Knowledge check: `quiz.yaml`.

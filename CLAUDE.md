@@ -203,20 +203,16 @@ The course covers **Storage**, worth **10%** of
 **Certified Kubernetes Administrator (CKA)**. It is part of **ATP005**.
 The official objectives are listed in `astrona.yaml` and mapped in `CURRICULUM.md`.
 
-### Reading-only scope
+### Playground and graded lab scope
 
-The maintainer approved the lesson plan, asked for deeper teaching, and explicitly
-requested **no labs or playgrounds**. That instruction overrides shared examples
-about hands-on environments, graded labs and playground markers. Do not create
-runtime configurations, executable exercises or playground lifecycle markers.
-The course must be usable without a cluster or installed command-line tools.
+The maintainer requested playgrounds and graded labs on 2026-10-13. This supersedes the earlier reading-only instruction. Each active module has one private ungraded environment and guided practice. Register each independent graded task, launch entry and solution directly after the reading it practises. Retain draft technical pages and the existing question banks. Use context guards and bounded waits; node commands may target only this environment's containers. Record static, offline and live evidence separately.
 
 ### Teaching structure and depth
 
 Every section begins with its own introduction and measurable learning outcomes.
 Every module contains a landing page, developed teaching lessons and a final
 `# Summary` page. Put the summary after all its lessons and before the next
-module. This reading-only summary has no playground destruction marker.
+module. The summary ends with <!-- astrona:playground:destroy --> on its own line.
 
 Explain mechanisms, responsible components, realistic examples and the limits
 of each claim. Include worked reasoning and relevant failure cases. Avoid thin
@@ -248,4 +244,14 @@ The ATP registration remains draft until publication is approved.
 Primary author sources are recorded in `SOURCES.md`. The objective list was
 verified on 2026-10-11. Detailed reading expansions were written on 2026-10-11.
 Validate manifest paths, summary ordering, curriculum coverage and question
-contracts. Do not claim runtime verification for a reading-only course.
+contracts. Do not claim live verification until the actual runtime result has been recorded.
+
+### Added modules, labs and quizzes (UNTESTED)
+
+| Section | Modules added | Capstone | Quiz |
+| --- | --- | --- | --- |
+| 010 | 02 StorageClass fields and default class; 03 Pending claims | `capstone/labs/lab-01` (`ats-022-capstone-010`) | `quiz.yaml` |
+| 020 | 02 volume types; 03 access modes (ReadWriteOncePod); 04 reclaim and Released volumes | `capstone/labs/lab-01` (`ats-022-capstone-020`) | `quiz.yaml` |
+| 030 | 02 PVC resize; 03 binding control; 04 workloads and in-use protection | `capstone/labs/lab-01` (`ats-022-capstone-030`) | `quiz.yaml` |
+
+Tags: new labs carry `cka`, a topic tag and `untested` in `astrona.yaml`. Every added lab and playground has only had static checks (`astrona validate -c`, `bash -n`, YAML parse). Never claim live verification until it is recorded. Open risks: ReadWriteOncePod on hostPath volumes (documented for CSI) in section 020 module 03 and its capstone; resize labs check requested size, not `status.capacity`, because the kind local-path provisioner does not resize. `sections/final-domain-quiz.yaml` holds the final domain check. The `questions.yaml` banks stay as practice material.

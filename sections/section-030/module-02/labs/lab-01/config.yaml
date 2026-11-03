@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Resize A Persistent Volume Claim (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-030-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: class without expansion, a bound 100Mi claim `data`, and the
+# Deployment `data-writer` that mounts it. The fault is left in place on purpose.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the class, the claim and the Deployment
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: class-allows-expansion
+      description: The StorageClass training-grow allows volume expansion
+      type: file
+      source: validation/validate-class-allows-expansion.sh
+      hint: allowVolumeExpansion is a field of the StorageClass. You can patch it on an existing class.
+    - name: claim-requests-300mi
+      description: The claim data requests 300Mi
+      type: file
+      source: validation/validate-claim-requests-300mi.sh
+      hint: Edit spec.resources.requests.storage of the claim data. The API server refuses it until the class allows expansion.
+    - name: claim-not-recreated
+      description: The claim data is the original Bound claim
+      type: file
+      source: validation/validate-claim-not-recreated.sh
+      hint: Do not delete the claim. Its class cannot change, so change the class instead.
+    - name: writer-running
+      description: The data-writer Deployment still runs with the claim
+      type: file
+      source: validation/validate-writer-running.sh
+      hint: Leave the Deployment as it is.
+
+teardown:
+  keepCluster: false

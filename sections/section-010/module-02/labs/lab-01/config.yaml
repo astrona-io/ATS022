@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Create A Retaining Default StorageClass (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-010-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: the default class `standard` from kind, a non-default class
+# `training-fast`, and empty namespaces.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the namespaces and the decoy class
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: training-retain-class
+      description: The class training-retain has the required fields
+      type: file
+      source: validation/validate-training-retain-class.sh
+      hint: The provisioner is rancher.io/local-path. Set reclaimPolicy Retain, volumeBindingMode WaitForFirstConsumer and allowVolumeExpansion true.
+    - name: single-default-class
+      description: training-retain is the only default class
+      type: file
+      source: validation/validate-single-default-class.sh
+      hint: Set the annotation storageclass.kubernetes.io/is-default-class to "true" on the new class and to "false" on standard.
+    - name: logs-claim-uses-default
+      description: logs-data is bound and got the new class without naming it
+      type: file
+      source: validation/validate-logs-claim-uses-default.sh
+      hint: Leave storageClassName out of the claim. The claim binds when the Pod that uses it exists.
+    - name: logs-writer-wrote
+      description: logs-writer runs and wrote /data/written.txt
+      type: file
+      source: validation/validate-logs-writer-wrote.sh
+      hint: The Pod mounts logs-data at /data and writes the file when it starts.
+    - name: volume-retained
+      description: The PV behind logs-data keeps the Retain policy
+      type: file
+      source: validation/validate-volume-retained.sh
+      hint: The PV copies the reclaim policy from the class when it is created, so the class must exist first.
+
+teardown:
+  keepCluster: false

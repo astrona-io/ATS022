@@ -1,0 +1,40 @@
+# Starting state: the Starfleet namespaces, a `probe` workload without storage
+# and a second, non-default StorageClass `training-fast`. kind already
+# provides the default StorageClass `standard`.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: outpost
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: training-fast
+provisioner: rancher.io/local-path
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe
+  namespace: starfleet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: probe
+  template:
+    metadata:
+      labels:
+        app: probe
+    spec:
+      containers:
+      - name: probe
+        image: docker.io/library/busybox:1.37.0
+        command: ["sh", "-c", "sleep 36000"]

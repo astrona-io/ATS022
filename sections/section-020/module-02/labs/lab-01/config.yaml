@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Combine Memory-Backed And Projected Volumes (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-020-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the namespace, the ConfigMap and the Secret
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: pod-running
+      description: The Pod scout-relay is Ready with two containers
+      type: file
+      source: validation/validate-pod-running.sh
+      hint: Create a Pod named scout-relay in starfleet with the containers writer and reader.
+    - name: shared-emptydir
+      description: Both containers share a memory-backed emptyDir limited to 64Mi
+      type: file
+      source: validation/validate-shared-emptydir.sh
+      hint: Use emptyDir with medium Memory and sizeLimit 64Mi, and mount the same volume in both containers.
+    - name: projected-settings
+      description: A projected volume combines the ConfigMap and the Secret, read-only in reader, token mode 0400
+      type: file
+      source: validation/validate-projected-settings.sh
+      hint: Use one projected volume with a configMap source and a secret source. Set mode 0400 on the token item and mount it at /etc/scout with readOnly true.
+    - name: settings-read-only
+      description: reader cannot write into the projected directory
+      type: file
+      source: validation/validate-settings-read-only.sh
+      hint: Mount the projected volume in reader with readOnly true.
+
+teardown:
+  keepCluster: false

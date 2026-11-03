@@ -1,0 +1,427 @@
+# Final domain knowledge check across all three sections.
+---
+schema_version: 1
+kind: question_bank
+id: ats022-final
+course_id: ATS022
+exam_code: CKA
+status: draft
+provenance: Original practice material written for this course; not official exam
+  questions.
+scope:
+  type: domain
+  id: storage
+  title: Storage
+questions:
+- id: ats022-final-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain what a StorageClass holds and which component creates
+    the volume
+  source_readings:
+  - sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
+  prompt: A team writes a PersistentVolumeClaim that names the StorageClass `training-fast`.
+    Which statement about the class is correct?
+  options:
+  - id: a
+    text: The class is a namespaced object and must be in the same namespace as the
+      claim.
+    explanation: A StorageClass is cluster-scoped and has no namespace.
+  - id: b
+    text: The class contains the data of the volume.
+    explanation: The data lives in the volume the provisioner creates, not in the
+      class.
+  - id: c
+    text: The class starts the controller that creates volumes.
+    explanation: Creating a class does not install or start a provisioner. A controller
+      that serves the provisioner name must already run.
+  - id: d
+    text: The class names a provisioner and settings that are used when a volume is
+      created for the claim.
+    explanation: Correct. The class holds the provisioner name, parameters, reclaim
+      policy, binding mode and expansion setting.
+  correct_option: d
+  explanation: A StorageClass is a cluster-scoped description of how to create volumes.
+    It does not run anything.
+- id: ats022-final-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the StorageClass fields that cannot be changed after creation
+  source_readings:
+  - sections/section-010/module-02/course-01-storageclass-fields-and-what-they-control.md
+  prompt: An administrator runs `kubectl patch storageclass training-archive --type
+    merge -p '{"reclaimPolicy":"Delete"}'` and the API server rejects it. What is
+    the way to get a class with that policy?
+  options:
+  - id: a
+    text: Restart the kube-apiserver.
+    explanation: A restart does not change the validation rules.
+  - id: b
+    text: Delete the class and create it again with the new policy.
+    explanation: Correct. `provisioner`, `parameters`, `reclaimPolicy` and `volumeBindingMode`
+      cannot be edited. Existing PVs keep their own copy of the policy.
+  - id: c
+    text: Patch the PersistentVolumes first, then the class.
+    explanation: Patching PVs does not make the class editable.
+  - id: d
+    text: 'Add the annotation `storageclass.kubernetes.io/mutable: "true"` to the
+      class.'
+    explanation: No such annotation exists.
+  correct_option: b
+  explanation: The four fields are immutable, so the class must be replaced.
+- id: ats022-final-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Use an empty storageClassName to bind a manually created volume
+  source_readings:
+  - sections/section-010/module-02/course-02-the-default-storageclass-and-claim-class-selection.md
+  prompt: A cluster has a default class. An administrator created a PersistentVolume
+    with no class. Which claim setting binds to it and avoids dynamic provisioning?
+  options:
+  - id: a
+    text: 'Set `storageClassName: ""` in the claim.'
+    explanation: Correct. An empty string asks for no class, so only a PV with an
+      empty class can match.
+  - id: b
+    text: 'Set `storageClassName: standard` in the claim.'
+    explanation: The claim would use the default class and a provisioner would create
+      a new volume.
+  - id: c
+    text: 'Set `volumeBindingMode: Immediate` in the claim.'
+    explanation: "`volumeBindingMode` is a field of the class, not of the claim."
+  - id: d
+    text: Omit `storageClassName` from the claim.
+    explanation: An absent field receives the default class, so the claim asks for
+      dynamic provisioning.
+  correct_option: a
+  explanation: An empty string disables the default class for that claim.
+- id: ats022-final-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Read the events of a Pending claim and name the cause
+  source_readings:
+  - sections/section-010/module-03/course-01-reading-a-pending-claim.md
+  prompt: A claim is Pending. `kubectl describe pvc` shows an event from the PV controller
+    that a StorageClass named `standard-fast` was not found. Which action fixes it?
+  options:
+  - id: a
+    text: Patch `storageClassName` on the claim to `standard`.
+    explanation: The field cannot be edited after creation, so the patch is rejected.
+  - id: b
+    text: Restart the Pod that uses the claim.
+    explanation: The Pod is not the problem. Restarting does not create the class.
+  - id: c
+    text: Create a StorageClass named `standard-fast`, or recreate the claim with
+      a class that exists.
+    explanation: Correct. Either the claim gets the object it names, or it is replaced
+      with a valid one.
+  - id: d
+    text: Increase the memory of the node.
+    explanation: Memory is unrelated to a missing class.
+  correct_option: c
+  explanation: A missing class is repaired by creating it or by replacing the claim.
+- id: ats022-final-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Repair a claim by deleting and recreating it
+  source_readings:
+  - sections/section-010/module-03/course-02-repairing-a-pending-claim.md
+  prompt: A claim `reports` with a wrong class is used by the Pod `reports-writer`.
+    Which order of actions repairs it?
+  options:
+  - id: a
+    text: Delete the Pod, delete the claim, then create the claim with a valid class
+      and the Pod again.
+    explanation: Correct. The claim class and the Pod volumes cannot be edited, and
+      a claim in use is protected until the Pod is deleted.
+  - id: b
+    text: Patch the claim class, then patch the Pod volumes.
+    explanation: Both patches are rejected.
+  - id: c
+    text: Delete only the Pod and keep the claim.
+    explanation: The claim still has the wrong class.
+  - id: d
+    text: Delete the claim first, then the Pod, then edit nothing.
+    explanation: A claim in use stays Terminating until the Pod is gone, so the Pod
+      comes first.
+  correct_option: a
+  explanation: Delete the Pod, then the claim, then create both again.
+- id: ats022-final-q06
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Distinguish data that lives as long as the Pod from data that
+    outlives it
+  source_readings:
+  - sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
+  prompt: A Pod writes a cache to an `emptyDir` volume and its results to a PersistentVolumeClaim.
+    The Pod is deleted and a new Pod is created with the same spec. What is true?
+  options:
+  - id: a
+    text: The cache and the results are both gone.
+    explanation: An `emptyDir` is removed when the Pod is removed from the node, so
+      the claim is not what is lost.
+  - id: b
+    text: The cache is gone and the results are still in the claim's volume.
+    explanation: Correct. An `emptyDir` lives as long as the Pod. A claim is a separate
+      object that is not deleted with the Pod, so its data remains.
+  - id: c
+    text: The cache is still there because `emptyDir` is stored on the node.
+    explanation: The node directory of an `emptyDir` is deleted with the Pod.
+  - id: d
+    text: The results are gone because a claim is deleted with its Pod.
+    explanation: A PersistentVolumeClaim is its own API object and is not owned by
+      the Pod.
+  correct_option: b
+  explanation: Correct. An `emptyDir` lives as long as the Pod. A claim is a separate
+    object that is not deleted with the Pod, so its data remains.
+- id: ats022-final-q07
+  type: single_choice
+  difficulty: beginner
+  learning_objective: State what the reclaim policy controls
+  source_readings:
+  - sections/section-020/module-04/course-01-reclaim-policy-and-claim-deletion.md
+  prompt: When is the `persistentVolumeReclaimPolicy` of a PersistentVolume applied?
+  options:
+  - id: a
+    text: When the Pod that uses the volume is deleted.
+    explanation: Deleting the Pod does not release the claim, so the policy is not
+      applied.
+  - id: b
+    text: When the PersistentVolumeClaim bound to the volume is deleted.
+    explanation: 'Correct. The policy decides what happens to the volume and its data
+      after its claim is deleted: `Delete` removes them, `Retain` keeps the volume
+      as `Released`.'
+  - id: c
+    text: When the volume is created.
+    explanation: Creation does not apply a reclaim policy; the policy is only read
+      at release time.
+  - id: d
+    text: When the node that holds the data is drained.
+    explanation: A drain evicts Pods and does not touch the volume's policy.
+  correct_option: b
+  explanation: 'Correct. The policy decides what happens to the volume and its data
+    after its claim is deleted: `Delete` removes them, `Retain` keeps the volume as
+    `Released`.'
+- id: ats022-final-q08
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Combine a ConfigMap and a Secret in one mount with a file mode
+  source_readings:
+  - sections/section-020/module-02/course-02-configuration-secrets-and-projected-volumes.md
+  prompt: A container must read a ConfigMap and a Secret from one directory, and the
+    Secret file must be mode 0400. Which volume does this?
+  options:
+  - id: a
+    text: Two volumes of type `configMap` and `secret` mounted at the same `mountPath`.
+    explanation: Two mounts cannot share a `mountPath`.
+  - id: b
+    text: 'One `projected` volume with a `configMap` source and a `secret` source
+      and `mode: 0400` on the Secret item.'
+    explanation: Correct. A `projected` volume merges several sources into one directory,
+      and an item `mode` sets the permission of that file.
+  - id: c
+    text: 'One `emptyDir` with `defaultMode: 0400`.'
+    explanation: An `emptyDir` has no `defaultMode` and does not read API objects.
+  - id: d
+    text: One `downwardAPI` volume with both objects listed.
+    explanation: A `downwardAPI` volume exposes Pod fields, not ConfigMaps or Secrets.
+  correct_option: b
+  explanation: Correct. A `projected` volume merges several sources into one directory,
+    and an item `mode` sets the permission of that file.
+- id: ats022-final-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Predict the scheduling result for a second Pod on a ReadWriteOncePod
+    claim
+  source_readings:
+  - sections/section-020/module-03/course-02-single-pod-claims-and-read-only-mounts.md
+  prompt: A claim has the access mode `ReadWriteOncePod`. One Pod uses it and runs.
+    A second Pod that names the same claim is created. What is the result?
+  options:
+  - id: a
+    text: Both Pods run if they are on the same node.
+    explanation: "`ReadWriteOnce` allows Pods on one node; `ReadWriteOncePod` does
+      not."
+  - id: b
+    text: The second Pod stays Pending because only one Pod may use the claim.
+    explanation: Correct. `ReadWriteOncePod` allows a single Pod in the whole cluster,
+      so the scheduler leaves the second Pod unscheduled.
+  - id: c
+    text: The first Pod is restarted on another node.
+    explanation: The first Pod is not touched.
+  - id: d
+    text: The claim is bound again to a second volume.
+    explanation: A claim binds to one volume and does not rebind for a second Pod.
+  correct_option: b
+  explanation: Correct. `ReadWriteOncePod` allows a single Pod in the whole cluster,
+    so the scheduler leaves the second Pod unscheduled.
+- id: ats022-final-q10
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Reuse a Released volume
+  source_readings:
+  - sections/section-020/module-04/course-02-released-volumes-and-rebinding.md
+  prompt: A `Retain` volume is `Released`. A new claim names it with `volumeName`
+    but stays Pending. What must be done?
+  options:
+  - id: a
+    text: Delete the volume and create it again.
+    explanation: Deleting the volume object does not keep the data that the policy
+      was to preserve.
+  - id: b
+    text: Clear `spec.claimRef` on the volume so that it becomes Available.
+    explanation: Correct. A Released volume still references the old claim. Removing
+      `spec.claimRef` makes it Available, and the new claim can bind to it.
+  - id: c
+    text: Change the access mode of the new claim to `ReadWriteMany`.
+    explanation: The access mode of the claim must match the volume; changing it does
+      not clear the old reference.
+  - id: d
+    text: Add the finalizer `kubernetes.io/pv-protection`.
+    explanation: That finalizer only blocks deletion of a volume that is still bound.
+  correct_option: b
+  explanation: Correct. A Released volume still references the old claim. Removing
+    `spec.claimRef` makes it Available, and the new claim can bind to it.
+- id: ats022-final-q11
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain which fields a claim and a volume must match to bind
+  source_readings:
+  - sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
+  - sections/section-030/module-03/course-01-how-a-claim-finds-its-volume.md
+  prompt: A claim in `starfleet` asks for `100Mi`, `ReadWriteOnce` and the class `manual`.
+    One unbound PersistentVolume exists with capacity `500Mi`, `ReadWriteOnce` and
+    the class `manual`. What happens?
+  options:
+  - id: a
+    text: The claim stays Pending because the sizes differ.
+    explanation: A volume that is larger than the request can bind. Only a smaller
+      volume cannot.
+  - id: b
+    text: The claim binds the volume and reports the volume's full `500Mi` as its
+      capacity.
+    explanation: Correct. The volume is at least as big as the request and the class
+      and access mode match, so the claim binds and the claim reports the bound volume's
+      capacity.
+  - id: c
+    text: The claim binds only after an administrator shrinks the volume to `100Mi`.
+    explanation: Volumes are never shrunk to fit a claim.
+  - id: d
+    text: The claim creates a new `100Mi` volume.
+    explanation: Static binding does not provision. A new volume would need a StorageClass
+      with a provisioner.
+  correct_option: b
+  explanation: The volume matches the class and access mode and is large enough, so
+    the claim binds it. The claim then shows the capacity of the volume.
+- id: ats022-final-q12
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Recognize what a StatefulSet creates for each replica
+  source_readings:
+  - sections/section-030/module-04/course-01-mount-claims-in-pods-deployments-and-statefulsets.md
+  prompt: A StatefulSet `crew` has 3 replicas and a `volumeClaimTemplates` entry named
+    `data`. Which claim names does it create?
+  options:
+  - id: a
+    text: "`data`, a single claim shared by all replicas."
+    explanation: Each replica gets its own claim, not a shared one.
+  - id: b
+    text: "`crew-data-0`, `crew-data-1` and `crew-data-2`."
+    explanation: The name starts with the template name, not the StatefulSet name.
+  - id: c
+    text: "`data-crew-0`, `data-crew-1` and `data-crew-2`."
+    explanation: Correct. The claim name is the template name, the StatefulSet name
+      and the ordinal.
+  - id: d
+    text: No claims, until the Pods are bound to a PersistentVolume by hand.
+    explanation: The StatefulSet controller creates the claims itself.
+  correct_option: c
+  explanation: Claims are named `<template>-<statefulset>-<ordinal>`, so `data-crew-0`
+    to `data-crew-2`.
+- id: ats022-final-q13
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Resize a claim whose class does not allow expansion
+  source_readings:
+  - sections/section-030/module-02/course-01-grow-a-claim-through-its-storageclass.md
+  - sections/section-030/module-02/course-02-when-a-resize-is-refused-or-does-not-grow.md
+  prompt: The claim `data` (class `training-grow`, `100Mi`) must become `300Mi` and
+    keep its data. The class has no `allowVolumeExpansion` field. What is the correct
+    order?
+  options:
+  - id: a
+    text: Delete the claim and create a new one at `300Mi`.
+    explanation: The old data would be lost with a Delete reclaim policy, and the
+      task says to keep it.
+  - id: b
+    text: Patch the claim first. The API server will enable expansion for the class.
+    explanation: The API server never changes the class by itself, and the patch is
+      refused.
+  - id: c
+    text: 'Set `allowVolumeExpansion: true` on the class, then raise the request on
+      the existing claim.'
+    explanation: Correct. The class field can be changed on an existing class, and
+      the claim request can then grow in place.
+  - id: d
+    text: Edit `status.capacity` of the claim to `300Mi`.
+    explanation: Status is written by the control plane. Editing it does not resize
+      anything.
+  correct_option: c
+  explanation: Enable expansion on the class first, then edit the request of the same
+    claim. The claim keeps its identity and data.
+- id: ats022-final-q14
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why a claim stays in Terminating
+  source_readings:
+  - sections/section-030/module-04/course-02-storage-object-in-use-protection.md
+  prompt: "`kubectl delete pvc old-claim` returns, but the claim stays `Terminating`.
+    `kubectl describe pvc old-claim` lists `Used By: holder`. What is the safest way
+    to finish the deletion?"
+  options:
+  - id: a
+    text: Remove the `kubernetes.io/pvc-protection` finalizer with `kubectl patch`.
+    explanation: This does finish the deletion, but it skips the protection that stops
+      data loss while a Pod still uses the claim.
+  - id: b
+    text: Run `kubectl delete pvc old-claim --force`.
+    explanation: A forced delete of a claim does not stop the Pod from using it. The
+      finalizer still applies.
+  - id: c
+    text: Delete the volume that backs the claim.
+    explanation: The volume has its own protection and is not the blocker.
+  - id: d
+    text: Delete or stop the Pod `holder`.
+    explanation: Correct. The finalizer is removed by the controller once no Pod uses
+      the claim.
+  correct_option: d
+  explanation: The `pvc-protection` finalizer holds the claim while a Pod uses it.
+    Stop the Pod and the controller completes the deletion.
+- id: ats022-final-q15
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Predict the status of a resized claim on a provisioner that
+    cannot resize
+  source_readings:
+  - sections/section-030/module-02/course-02-when-a-resize-is-refused-or-does-not-grow.md
+  prompt: 'A claim is raised from `100Mi` to `250Mi` on a class with `allowVolumeExpansion:
+    true`, but the provisioner does not implement resizing. What does the cluster
+    show?'
+  options:
+  - id: a
+    text: "`spec.resources.requests.storage` is `250Mi`, and `status.capacity.storage`
+      can stay at `100Mi`."
+    explanation: Correct. The request is accepted, but the capacity changes only if
+      the provisioner resizes the volume.
+  - id: b
+    text: The edit is rolled back to `100Mi` after a minute.
+    explanation: The API server does not roll back an accepted edit.
+  - id: c
+    text: The claim becomes Lost.
+    explanation: Lost is the phase of a claim whose volume is gone.
+  - id: d
+    text: The Pod is restarted with a new volume of `250Mi`.
+    explanation: Resizing does not replace the volume or restart the Pod by itself.
+  correct_option: a
+  explanation: The request is stored in `spec`. The capacity in `status` follows only
+    when the volume is resized.

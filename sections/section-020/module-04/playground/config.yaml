@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Module 020/04 playground. A clean sandbox: it starts, applies the starting
+# objects, then stays running for free exploration. No task, no grading.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-playground-020-04
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  init:
+    - name: seed-playground
+      description: Create the starting objects
+      type: file
+      source: bootstrap/setup.sh
+
+teardown:
+  keepCluster: false

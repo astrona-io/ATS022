@@ -17,3 +17,11 @@ Each module begins with its goals and ends with a summary. Reusable YAML knowled
 - Distinguish expected delayed binding from failure.
 - Evaluate topology, expansion and driver capabilities.
 - Identify retention consequences before administrative changes.
+
+## Modules
+
+- Module 01 (existing): the original reading and lab.
+- Module 02: Configure StorageClass Fields And The Default Class. Parts: StorageClass Fields And What They Control; The Default StorageClass And Claim Class Selection. Lab: Create A Retaining Default StorageClass.
+- Module 03: Diagnose Pending Claims And Provisioning Failures. Parts: Reading A Pending Claim; Repairing A Pending Claim. Lab: Repair Pending Claims.
+- Capstone: StorageClasses And Dynamic Provisioning.
+- Knowledge check: `quiz.yaml`.

@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Enforce A Single-Pod Claim And A Read-Only Mount (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-lab-020-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the namespace and two static PersistentVolumes
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: single-claim-bound
+      description: feed-single is ReadWriteOncePod and bound to training-single
+      type: file
+      source: validation/validate-single-claim-bound.sh
+      hint: Request only ReadWriteOncePod, set storageClassName to an empty string and volumeName to training-single.
+    - name: writer-runs
+      description: feed-writer is Ready and writes to the claim
+      type: file
+      source: validation/validate-writer-runs.sh
+      hint: Mount the claim feed-single at /data in a Pod named feed-writer.
+    - name: second-pod-pending
+      description: feed-second uses the same claim and stays Pending
+      type: file
+      source: validation/validate-second-pod-pending.sh
+      hint: Create a second Pod with the same claim. The scheduler keeps it Pending while feed-writer runs.
+    - name: reader-read-only
+      description: feed-reader mounts the ReadOnlyMany claim read-only
+      type: file
+      source: validation/validate-reader-read-only.sh
+      hint: Bind feed-shared to training-readonly and set readOnly true under persistentVolumeClaim in the Pod volume.
+
+teardown:
+  keepCluster: false

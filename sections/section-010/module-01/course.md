@@ -16,9 +16,11 @@ This module develops storage Classes And Provisioning Decisions. It connects the
 
 ## Before You Start
 
-Examples describe system behavior. No runtime is required. Read each field or diagnostic name as part of the stated contract.
+Use the module playground for guided practice. Graded exercises use independent environments and follow the readings they practise.
 
 ## Reading Order
 
 1. Provisioning, Classes And Drivers
 2. Summary
+
+<!-- astrona:playground -->

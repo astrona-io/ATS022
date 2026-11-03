@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Configure StorageClass Fields And The Default Class (PLAYGROUND). UNTESTED.
+# A clean sandbox: no task, no grading, no `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-playground-010-02
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+bootstrap:
+  manifests:
+    - name: start
+      type: file
+      source: manifests/start.yaml
+  waitFor:
+    - resource: deploy/probe
+      namespace: starfleet
+
+teardown:
+  keepCluster: false

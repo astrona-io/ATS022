@@ -16,7 +16,7 @@ This module develops volume Lifetime, Access And Reclaim. It connects the intend
 
 ## Before You Start
 
-Examples describe system behavior. No runtime is required. Read each field or diagnostic name as part of the stated contract.
+Use the module playground for guided practice. Graded exercises use independent environments and follow the readings they practise.
 
 ## Reading Order
 
@@ -24,3 +24,5 @@ Examples describe system behavior. No runtime is required. Read each field or di
 2. Access Modes And Data Presentation
 3. Reclaim Policies And Recovery
 4. Summary
+
+<!-- astrona:playground -->

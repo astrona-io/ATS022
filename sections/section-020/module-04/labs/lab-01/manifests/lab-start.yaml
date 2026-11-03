@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: training-archive
+spec:
+  capacity:
+    storage: 64Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /var/local/training-archive
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: archive-old
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: training-archive
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scratch-data
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scratch-writer
+  namespace: starfleet
+spec:
+  containers:
+    - name: writer
+      image: docker.io/library/busybox:1.37.0
+      command: ["sh", "-c", "echo scratch > /scratch/note && sleep 3600"]
+      volumeMounts:
+        - name: scratch
+          mountPath: /scratch
+  volumes:
+    - name: scratch
+      persistentVolumeClaim:
+        claimName: scratch-data

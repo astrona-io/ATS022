@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: probe-settings
+  namespace: starfleet
+data:
+  mode: survey
+  interval: "30"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: probe-token
+  namespace: starfleet
+type: Opaque
+stringData:
+  token: capstone-token-91c2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: training-ledger
+spec:
+  capacity:
+    storage: 64Mi
+  accessModes:
+    - ReadWriteOncePod
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /var/local/training-ledger
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ledger-old
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadWriteOncePod
+  storageClassName: ""
+  volumeName: training-ledger
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: journal
+  namespace: starfleet
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: journal-writer
+  namespace: starfleet
+spec:
+  containers:
+    - name: writer
+      image: docker.io/library/busybox:1.37.0
+      command: ["sh", "-c", "echo entry > /journal/entry && sleep 3600"]
+      volumeMounts:
+        - name: journal
+          mountPath: /journal
+  volumes:
+    - name: journal
+      persistentVolumeClaim:
+        claimName: journal

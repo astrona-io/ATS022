@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Persistent Volumes And Claims Capstone (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-capstone-030
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: two labelled static volumes, a claim on a class without
+# expansion, a headless Service, and a claim stuck in Terminating. The faults
+# and gaps are left in place on purpose.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the volumes, the claims, the Service and the Pods
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: vault-bound-to-hot
+      description: The claim vault is Bound to the tier=hot volume by selector
+      type: file
+      source: validation/validate-vault-bound-to-hot.sh
+      hint: Create vault with the class manual, ReadWriteOnce, 300Mi and a selector on tier hot.
+    - name: relay-claims
+      description: The StatefulSet relay has one Bound claim per replica
+      type: file
+      source: validation/validate-relay-claims.sh
+      hint: Use the Service relay as serviceName and a volumeClaimTemplates entry named store.
+    - name: telemetry-grown
+      description: The claim telemetry requests 250Mi and its class allows expansion
+      type: file
+      source: validation/validate-telemetry-grown.sh
+      hint: The class must allow expansion first. Then edit the request of the original claim.
+    - name: retired-data-released
+      description: The claim retired-data and its Pod are gone
+      type: file
+      source: validation/validate-retired-data-released.sh
+      hint: Find the Pod that uses the claim and delete the Pod. Do not patch the finalizer.
+    - name: volumes-and-workload-unchanged
+      description: The static volumes and the telemetry-writer Deployment are unchanged
+      type: file
+      source: validation/validate-volumes-and-workload-unchanged.sh
+      hint: Fix the claims and the workloads you were asked about. Do not edit the volumes.
+
+teardown:
+  keepCluster: false

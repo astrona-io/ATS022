@@ -11,7 +11,7 @@ scope:
   title: Configure volume types, access modes and reclaim policies
 placement:
   position: after
-  reading: sections/section-020/module-01/course-04-summary.md
+  reading: sections/section-020/module-01/course-05-summary.md
 questions:
 - id: ats022-section-020-q01
   type: single_choice

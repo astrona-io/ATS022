@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# StorageClasses And Dynamic Provisioning Capstone (LAB). Graded against the live cluster. UNTESTED.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-capstone-010
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: the default class `standard`, a claim probe-data that names
+# the missing class fast-retain, and a Deployment probe that cannot start.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the claim, the Deployment and the baseline record
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: fast-retain-class
+      description: The class fast-retain has the required fields
+      type: file
+      source: validation/validate-fast-retain-class.sh
+      hint: Provisioner rancher.io/local-path, reclaimPolicy Retain, volumeBindingMode WaitForFirstConsumer, allowVolumeExpansion true.
+    - name: single-default-class
+      description: fast-retain is the only default class
+      type: file
+      source: validation/validate-single-default-class.sh
+      hint: Mark the new class with the default annotation and set it to "false" on standard. Do not delete standard.
+    - name: probe-available
+      description: probe is available on probe-data and wrote /data/boot.txt
+      type: file
+      source: validation/validate-probe-available.sh
+      hint: Read the events of the claim. The claim cannot be edited, and the Deployment must not be recreated.
+    - name: shuttle-uses-default
+      description: shuttle-data got the default class and shuttle wrote /data/log.txt
+      type: file
+      source: validation/validate-shuttle-uses-default.sh
+      hint: Do not set storageClassName in the claim. The Pod must mount it at /data.
+    - name: volumes-retained
+      description: Both PVs keep the Retain policy
+      type: file
+      source: validation/validate-volumes-retained.sh
+      hint: The PV copies the policy from the class when it is created.
+    - name: deployment-kept
+      description: The probe Deployment was not deleted and recreated
+      type: file
+      source: validation/validate-deployment-kept.sh
+      hint: Fix the storage side. The Deployment keeps its identity.
+
+teardown:
+  keepCluster: false

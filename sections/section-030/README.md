@@ -17,3 +17,12 @@ Each module begins with its goals and ends with a summary. Reusable YAML knowled
 - Distinguish static binding from dynamic allocation.
 - Diagnose provisioning, attachment and mount stages.
 - Evaluate expansion and safe retained-volume reuse.
+
+## Modules
+
+- Module 01 (existing): the original reading and lab.
+- Module 02: Resize A Persistent Volume Claim. Parts: Grow A Claim Through Its StorageClass; When A Resize Is Refused Or Does Not Grow. Lab: Resize A Persistent Volume Claim.
+- Module 03: Control Which Volume A Claim Binds. Parts: How A Claim Finds Its Volume; Node Affinity, Mount Options And Pending Claims. Lab: Control Which Volume A Claim Binds.
+- Module 04: Mount Claims In Workloads And Protect Them. Parts: Mount Claims In Pods, Deployments And StatefulSets; Storage Object In Use Protection. Lab: Mount Claims In Workloads And Protect Them.
+- Capstone: Persistent Volumes And Claims.
+- Knowledge check: `quiz.yaml`.

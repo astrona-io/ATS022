@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon-log
+  namespace: starfleet
+spec:
+  clusterIP: None
+  selector:
+    app: beacon-log
+  ports:
+  - name: placeholder
+    port: 80
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: old-claim
+  namespace: starfleet
+spec:
+  storageClassName: standard
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: holder
+  namespace: starfleet
+spec:
+  containers:
+  - name: holder
+    image: docker.io/library/busybox:1.37.0
+    command:
+    - sh
+    - -c
+    - echo held > /data/state; sleep 36000
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: old-claim

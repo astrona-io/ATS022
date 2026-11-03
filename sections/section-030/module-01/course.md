@@ -16,9 +16,11 @@ This module develops persistent Object Binding And Administration. It connects t
 
 ## Before You Start
 
-Examples describe system behavior. No runtime is required. Read each field or diagnostic name as part of the stated contract.
+Use the module playground for guided practice. Graded exercises use independent environments and follow the readings they practise.
 
 ## Reading Order
 
 1. Binding, Expansion And Administrative Storage Decisions
 2. Summary
+
+<!-- astrona:playground -->

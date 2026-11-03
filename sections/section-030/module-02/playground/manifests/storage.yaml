@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: training-grow
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: training-expand
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data
+  namespace: starfleet
+spec:
+  storageClassName: training-grow
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logs
+  namespace: starfleet
+spec:
+  storageClassName: training-expand
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-writer
+  namespace: starfleet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-writer
+  template:
+    metadata:
+      labels:
+        app: data-writer
+    spec:
+      containers:
+      - name: writer
+        image: docker.io/library/busybox:1.37.0
+        command:
+        - sh
+        - -c
+        - echo ready > /data/ready; echo ready > /logs/ready; sleep 36000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: logs
+          mountPath: /logs
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs

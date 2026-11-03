@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Control Which Volume A Claim Binds (PLAYGROUND). Clean sandbox, no task, no grading.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-022-playground-030-03
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - docker.io/library/busybox:1.37.0
+
+# Starting state: three static hostPath volumes with the class name `manual`
+# and a claim `manifest` that matches none of them.
+bootstrap:
+  manifests:
+    - name: volumes
+      type: file
+      source: manifests/volumes.yaml
+  waitFor:
+    - resource: nodes
+      all: true
+
+teardown:
+  keepCluster: false

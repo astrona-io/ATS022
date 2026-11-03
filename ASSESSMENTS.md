@@ -28,3 +28,14 @@ ID, not display position, so a later renderer can shuffle choices safely.
 
 The banks contain answer keys and are public learning material, so this is not
 a secure examination bank. Do not treat scores as an official CKA result.
+
+## Hands-On Coverage
+
+This course has 3 ungraded module playgrounds and 4 draft independent labs. Tasks and solutions are registered around each lab immediately after its teaching reading. Static configuration, shell/Python/YAML, parser, lifecycle and offline grader checks pass. Live execution remains pending because the session cannot access Podman; installed CLI configuration validation is separately blocked by its maintenance lock.
+
+| Module | Labs in teaching order |
+| --- | --- |
+| 010/01 | Provision Through A Delayed-Binding StorageClass |
+| 020/01 | Preserve Claim Data Across Pod Replacement |
+| 020/01 | Retain A Bound Volume Safely |
+| 030/01 | Bind A Claim To An Existing Volume |
