@@ -49,7 +49,7 @@ sections:
       after_reading: sections/section-010/module-01/course-01-provisioning-classes-and-drivers.md
       objective: Create a class and claim whose storage binds when its consumer can
         be scheduled.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings:
     - sections/section-010/module-01/course-02-guided-practice.md
@@ -87,14 +87,14 @@ sections:
       after_reading: sections/section-020/module-01/course-01-storage-lifecycles-and-claims.md
       objective: Observe persistent data surviving replacement while Pod-lifetime
         scratch data disappears.
-      status: draft
+      status: alpha
       runtime_verification: pending
     - id: lab-02
       path: sections/section-020/module-01/labs/lab-02
       after_reading: sections/section-020/module-01/course-03-reclaim-policies-and-recovery.md
       objective: Change a bound volume reclaim policy while preserving its active
         claim and consumer.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings:
     - sections/section-020/module-01/course-04-guided-practice.md
@@ -125,7 +125,7 @@ sections:
       path: sections/section-030/module-01/labs/lab-01
       after_reading: sections/section-030/module-01/course-01-binding-expansion-and-administrative-storage-decisions.md
       objective: Bind a named claim without invoking the default dynamic provisioner.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings:
     - sections/section-030/module-01/course-02-guided-practice.md

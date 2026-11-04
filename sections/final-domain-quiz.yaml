@@ -5,7 +5,7 @@ kind: question_bank
 id: ats022-final
 course_id: ATS022
 exam_code: CKA
-status: draft
+status: alpha
 provenance: Original practice material written for this course; not official exam
   questions.
 scope:
