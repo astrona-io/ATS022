@@ -152,7 +152,7 @@ modules:
     difficulty: advanced
     estimated_duration: 30m
     topic: dynamic-provisioning
-    task_kind: integration
+    task_kind: troubleshooting
     learning_goals:
     - Repair a blocked workload by combining class creation, default selection and claim recreation.
     tags:
@@ -352,7 +352,7 @@ modules:
     difficulty: advanced
     estimated_duration: 40m
     topic: volume-lifecycle
-    task_kind: integration
+    task_kind: build
     learning_goals:
     - Combine volume types, access modes and reclaim handling in one workload.
     tags:
@@ -527,7 +527,7 @@ modules:
     difficulty: advanced
     estimated_duration: 30m
     topic: pv-pvc-management
-    task_kind: integration
+    task_kind: build
     learning_goals:
     - Bind, template, resize and release claims in one cluster.
     tags:
